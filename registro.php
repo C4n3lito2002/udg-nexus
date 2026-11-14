@@ -2,12 +2,15 @@
 $pageTitle = 'Registro, acreditación y citas B2B — UDG NEXUS';
 $activePage = 'registro.php';
 require_once 'config.php';
+require_once 'includes/forms.php';   // sesión + token de un solo uso (antes de imprimir HTML)
 require_once 'includes/header.php';
 
 $okAcred = isset($_GET['acred']) && $_GET['acred'] === 'ok';
 $errAcred = isset($_GET['acred']) && $_GET['acred'] === 'error';
 $okCita = isset($_GET['cita']) && $_GET['cita'] === 'ok';
 $errCita = isset($_GET['cita']) && $_GET['cita'] === 'error';
+$expAcred = isset($_GET['acred']) && $_GET['acred'] === 'expirado';
+$expCita = isset($_GET['cita']) && $_GET['cita'] === 'expirado';
 ?>
 
 <header class="hero" style="padding-bottom: 3rem;">
@@ -29,9 +32,12 @@ $errCita = isset($_GET['cita']) && $_GET['cita'] === 'error';
       <div class="alert">Tu registro se guardó correctamente. Te contactaremos con los detalles de tu gafete antes del evento.</div>
     <?php elseif ($errAcred): ?>
       <div class="alert error">No pudimos guardar tu registro. Revisa que todos los campos obligatorios estén completos e inténtalo de nuevo.</div>
+    <?php elseif ($expAcred): ?>
+      <div class="alert error">El formulario expiró o ya se había enviado. Recarga la página e inténtalo de nuevo.</div>
     <?php endif; ?>
 
     <form action="procesar_acreditacion.php" method="post" data-validate novalidate>
+      <?= form_campo('acreditacion') ?>
       <div class="form-grid">
         <div class="field">
           <label for="nombre_completo">Nombre completo *</label>
@@ -88,9 +94,12 @@ $errCita = isset($_GET['cita']) && $_GET['cita'] === 'error';
       <div class="alert">Tu solicitud de cita se envió correctamente. El comité de Experiencia del Asistente te confirmará el horario.</div>
     <?php elseif ($errCita): ?>
       <div class="alert error">No pudimos registrar tu solicitud de cita. Revisa los campos obligatorios e inténtalo de nuevo.</div>
+    <?php elseif ($expCita): ?>
+      <div class="alert error">El formulario expiró o ya se había enviado. Recarga la página e inténtalo de nuevo.</div>
     <?php endif; ?>
 
     <form action="procesar_cita.php" method="post" data-validate novalidate>
+      <?= form_campo('cita_b2b') ?>
       <div class="form-grid">
         <div class="field">
           <label for="c_nombre">Nombre completo *</label>

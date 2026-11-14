@@ -44,6 +44,7 @@ function obtenerConexion(): mysqli
         : @new mysqli($host, DB_USER, DB_PASS, DB_NAME);
 
     if ($conexion->connect_error) {
+        error_log('UDG NEXUS: no se pudo conectar a MySQL: ' . $conexion->connect_error);
         http_response_code(500);
         die(
             '<div style="font-family: sans-serif; padding: 40px; max-width: 600px; margin: 60px auto; ' .

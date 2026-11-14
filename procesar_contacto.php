@@ -2,12 +2,20 @@
 /**
  * Procesa el formulario de contacto/patrocinio (contacto.php) e
  * inserta el registro en la tabla `contactos_patrocinio`.
+ * Protegido con token de un solo uso (CSRF + doble envío) y registro de errores:
+ * ver includes/forms.php.
  */
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/forms.php';
+
+const FORM = 'contacto';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: contacto.php');
-    exit;
+    form_redirigir('contacto.php');
+}
+
+if (($resultado = form_abrir(FORM)) !== null) {
+    form_redirigir('contacto.php?estado=' . $resultado);
 }
 
 $nombre  = trim($_POST['nombre_completo'] ?? '');
@@ -21,13 +29,21 @@ if (!in_array($asunto, $asuntosValidos, true)) {
     $asunto = 'Otro';
 }
 
-$valido = $nombre !== '' &&
-          filter_var($correo, FILTER_VALIDATE_EMAIL) &&
-          $mensaje !== '';
+$fallos = [];
+if ($nombre === '') {
+    $fallos[] = 'nombre_completo';
+}
+if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+    $fallos[] = 'correo';
+}
+if ($mensaje === '') {
+    $fallos[] = 'mensaje';
+}
 
-if (!$valido) {
-    header('Location: contacto.php?estado=error');
-    exit;
+if ($fallos) {
+    form_log(FORM, 'validacion', 'campos invalidos: ' . implode(', ', $fallos));
+    form_cerrar(false);
+    form_redirigir('contacto.php?estado=error');
 }
 
 $conexion = obtenerConexion();
@@ -36,11 +52,19 @@ $stmt = $conexion->prepare(
     'INSERT INTO contactos_patrocinio (nombre_completo, correo, empresa, asunto, mensaje)
      VALUES (?, ?, ?, ?, ?)'
 );
+if (!$stmt) {
+    form_log(FORM, 'bd_error', 'prepare fallo (' . $conexion->errno . '): ' . $conexion->error);
+    form_cerrar(false);
+    form_redirigir('contacto.php?estado=error');
+}
 $stmt->bind_param('sssss', $nombre, $correo, $empresa, $asunto, $mensaje);
 
 $exito = $stmt->execute();
+if (!$exito) {
+    form_log(FORM, 'bd_error', 'insert fallo (' . $stmt->errno . '): ' . $stmt->error);
+}
 $stmt->close();
 $conexion->close();
 
-header('Location: contacto.php?estado=' . ($exito ? 'ok' : 'error'));
-exit;
+form_cerrar($exito);
+form_redirigir('contacto.php?estado=' . ($exito ? 'ok' : 'error'));

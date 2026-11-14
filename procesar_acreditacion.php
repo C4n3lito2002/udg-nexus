@@ -2,12 +2,20 @@
 /**
  * Procesa el formulario de acreditación (registro.php) e inserta
  * el registro en la tabla `acreditaciones`.
+ * Protegido con token de un solo uso (CSRF + doble envío) y registro de errores:
+ * ver includes/forms.php.
  */
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/forms.php';
+
+const FORM = 'acreditacion';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: registro.php');
-    exit;
+    form_redirigir('registro.php');
+}
+
+if (($resultado = form_abrir(FORM)) !== null) {
+    form_redirigir('registro.php?acred=' . $resultado . '#acreditacion');
 }
 
 $nombre      = trim($_POST['nombre_completo'] ?? '');
@@ -23,13 +31,21 @@ $gafetesValidos = [
     'VIP', 'Staff', 'Estudiante/Público general',
 ];
 
-$valido = $nombre !== '' &&
-          filter_var($correo, FILTER_VALIDATE_EMAIL) &&
-          in_array($tipoGafete, $gafetesValidos, true);
+$fallos = [];
+if ($nombre === '') {
+    $fallos[] = 'nombre_completo';
+}
+if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+    $fallos[] = 'correo';
+}
+if (!in_array($tipoGafete, $gafetesValidos, true)) {
+    $fallos[] = 'tipo_gafete';
+}
 
-if (!$valido) {
-    header('Location: registro.php?acred=error#acreditacion');
-    exit;
+if ($fallos) {
+    form_log(FORM, 'validacion', 'campos invalidos: ' . implode(', ', $fallos));
+    form_cerrar(false);
+    form_redirigir('registro.php?acred=error#acreditacion');
 }
 
 $conexion = obtenerConexion();
@@ -39,11 +55,19 @@ $stmt = $conexion->prepare(
         (nombre_completo, correo, telefono, institucion_empresa, tipo_gafete, eje_tematico, comentarios)
      VALUES (?, ?, ?, ?, ?, ?, ?)'
 );
+if (!$stmt) {
+    form_log(FORM, 'bd_error', 'prepare fallo (' . $conexion->errno . '): ' . $conexion->error);
+    form_cerrar(false);
+    form_redirigir('registro.php?acred=error#acreditacion');
+}
 $stmt->bind_param('sssssss', $nombre, $correo, $telefono, $institucion, $tipoGafete, $eje, $comentarios);
 
 $exito = $stmt->execute();
+if (!$exito) {
+    form_log(FORM, 'bd_error', 'insert fallo (' . $stmt->errno . '): ' . $stmt->error);
+}
 $stmt->close();
 $conexion->close();
 
-header('Location: registro.php?acred=' . ($exito ? 'ok' : 'error') . '#acreditacion');
-exit;
+form_cerrar($exito);
+form_redirigir('registro.php?acred=' . ($exito ? 'ok' : 'error') . '#acreditacion');

@@ -92,3 +92,29 @@ Ambos se pueden repetir sin duplicar datos. Ojo: `db/seed/001_seed_catalogo.sql`
 - `agenda_usuario(usuario_id, actividad_id, alerta_minutos, alerta_vista, agregado_en)`; clave compuesta; borrado en cascada con usuarios y actividades.
 - Sin migración 004 la página `agenda.php` muestra un aviso y no ofrece botones; el resto de la app sigue funcionando.
 - `ahora.php` libera la sesión antes de responder para que las consultas periódicas no bloqueen otras peticiones.
+
+---
+
+# Endurecimiento de los formularios del sitio (acreditación, cita B2B y contacto)
+
+## 10. Qué cambió
+
+Afecta a `procesar_acreditacion.php`, `procesar_cita.php`, `procesar_contacto.php` y a las páginas `registro.php` y `contacto.php`. Todo vive en `includes/forms.php`.
+
+- **CSRF y doble envío con un solo mecanismo:** cada formulario trae un token de un solo uso ligado a la sesión (`form_campo()`). El procesador lo consume (`form_abrir()`):
+  - sin token, con token de otro formulario o vencido (2 h): no se guarda nada y la página muestra "El formulario expiró o ya se había enviado. Recarga la página…" (`?acred=expirado`, `?cita=expirado`, `?estado=expirado`);
+  - token ya usado (doble clic, botón "atrás", reenvío del POST): **no se vuelve a insertar** y se muestra el resultado del primer envío. Probado con 3 envíos simultáneos: 1 sola fila.
+- **Registro de errores:** `logs/formularios.log` guarda validaciones fallidas (solo el nombre de los campos), tokens inválidos, dobles envíos y errores de la base de datos (`prepare` o `insert`). Nunca guarda lo que escribió la persona. Se rota a `.log.1` al pasar de 1 MB. La carpeta `logs/` tiene un `.htaccess` que impide abrirla desde el navegador (probado: 403). Si no se puede escribir el archivo, se usa el log de PHP.
+- Si falla la conexión a MySQL, `config.php` también lo escribe en el log de PHP.
+- **Botón:** además de deshabilitarse al enviar, vuelve a su texto si la persona regresa con "atrás" (`main.js`).
+- La sesión (`nexus_sid`) ahora también se abre en `registro.php` y `contacto.php`; es la misma cookie de la app.
+- `h()` de `includes/app.php` quedó protegida con `function_exists` para convivir con `forms.php`.
+
+## 11. Para ver los errores
+
+Abre `logs/formularios.log` en VS Code. Ejemplo de líneas:
+
+```
+[2026-11-14 16:19:44] acreditacion | doble_envio | ip=::1 | se ignora el reenvio; resultado previo: ok
+[2026-11-14 16:19:44] cita_b2b | validacion | ip=::1 | campos invalidos: correo
+```

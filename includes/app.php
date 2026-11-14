@@ -19,9 +19,11 @@ date_default_timezone_set('America/Mexico_City');
    ============================================================ */
 
 /** Escapa texto para HTML. Úsalo en TODA salida de datos. */
-function h($valor): string
-{
-    return htmlspecialchars((string) $valor, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+if (!function_exists('h')) {
+    function h($valor): string
+    {
+        return htmlspecialchars((string) $valor, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
 }
 
 /** Conexión única por petición. */

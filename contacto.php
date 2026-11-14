@@ -2,10 +2,12 @@
 $pageTitle = 'Contacto y patrocinios — UDG NEXUS';
 $activePage = 'contacto.php';
 require_once 'config.php';
+require_once 'includes/forms.php';   // sesión + token de un solo uso (antes de imprimir HTML)
 require_once 'includes/header.php';
 
 $ok = isset($_GET['estado']) && $_GET['estado'] === 'ok';
 $err = isset($_GET['estado']) && $_GET['estado'] === 'error';
+$exp = isset($_GET['estado']) && $_GET['estado'] === 'expirado';
 ?>
 
 <header class="hero" style="padding-bottom: 3rem;">
@@ -28,9 +30,12 @@ $err = isset($_GET['estado']) && $_GET['estado'] === 'error';
         <div class="alert">Tu mensaje se envió correctamente. El equipo de vinculación tecnológica te contactará pronto.</div>
       <?php elseif ($err): ?>
         <div class="alert error">No pudimos enviar tu mensaje. Revisa los campos obligatorios e inténtalo de nuevo.</div>
+      <?php elseif ($exp): ?>
+        <div class="alert error">El formulario expiró o ya se había enviado. Recarga la página e inténtalo de nuevo.</div>
       <?php endif; ?>
 
       <form action="procesar_contacto.php" method="post" data-validate novalidate>
+        <?= form_campo('contacto') ?>
         <div class="form-grid">
           <div class="field full">
             <label for="nombre_completo">Nombre completo *</label>

@@ -94,9 +94,19 @@
       /* Evita envíos duplicados por doble clic. */
       var boton = form.querySelector('button[type="submit"]');
       if (boton) {
+        boton.setAttribute("data-texto", boton.textContent);
         boton.disabled = true;
         boton.textContent = "Enviando…";
       }
+    });
+  });
+
+  /* Si la persona vuelve con "atrás", el botón no debe quedarse en "Enviando…". */
+  window.addEventListener("pageshow", function (ev) {
+    if (!ev.persisted) return;
+    document.querySelectorAll('form[data-validate] button[type="submit"][data-texto]').forEach(function (b) {
+      b.disabled = false;
+      b.textContent = b.getAttribute("data-texto");
     });
   });
 })();
