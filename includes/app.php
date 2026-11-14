@@ -12,6 +12,8 @@ require_once __DIR__ . '/../config.php';
 
 date_default_timezone_set('America/Mexico_City');
 
+/* Sesiones y roles: se cargan al final de este archivo, cuando ya existen db() y consulta(). */
+
 /* ============================================================
    Utilidades básicas
    ============================================================ */
@@ -60,6 +62,25 @@ function consulta_uno(string $sql, string $tipos = '', array $params = []): ?arr
     return $filas[0] ?? null;
 }
 
+/** Ejecuta INSERT / UPDATE / DELETE preparado. Devuelve true si salió bien. */
+function ejecutar(string $sql, string $tipos = '', array $params = []): bool
+{
+    $stmt = db()->prepare($sql);
+    if (!$stmt) {
+        error_log('UDG NEXUS SQL: ' . db()->error);
+        return false;
+    }
+    if ($tipos !== '') {
+        $stmt->bind_param($tipos, ...$params);
+    }
+    $ok = $stmt->execute();
+    if (!$ok) {
+        error_log('UDG NEXUS SQL: ' . $stmt->error);
+    }
+    $stmt->close();
+    return $ok;
+}
+
 /* ============================================================
    Reloj del evento
    Si config_evento.reloj_simulado tiene valor, toda la app usa esa
@@ -79,21 +100,56 @@ function config_evento(string $clave, ?string $defecto = null): ?string
     return $cache[$clave] ?? $defecto;
 }
 
+/** Convierte 'AAAA-MM-DD HH:MM:SS' en fecha, o null si está vacío o mal escrito. */
+function parse_fecha_hora(?string $valor): ?DateTimeImmutable
+{
+    $valor = trim((string) $valor);
+    if ($valor === '') {
+        return null;
+    }
+    $d = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $valor);
+    return $d !== false ? $d : null;
+}
+
+/**
+ * Modo del reloj: 'real' (hora real), 'fijo' (se queda en reloj_base)
+ * o 'avance' (arranca en reloj_base y corre solo, x reloj_velocidad).
+ * Si la migración 003 no se ha importado, se usa el valor antiguo reloj_simulado.
+ */
+function reloj_modo(): string
+{
+    $m = config_evento('reloj_modo');
+    if ($m === null) {
+        return parse_fecha_hora(config_evento('reloj_simulado', '')) ? 'fijo' : 'real';
+    }
+    return in_array($m, ['real', 'fijo', 'avance'], true) ? $m : 'real';
+}
+
 function reloj_simulado_activo(): bool
 {
-    $v = trim((string) config_evento('reloj_simulado', ''));
-    if ($v === '') {
-        return false;
-    }
-    return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $v) !== false;
+    return reloj_modo() !== 'real';
 }
 
 function ahora_evento(): DateTimeImmutable
 {
-    if (reloj_simulado_activo()) {
-        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', trim(config_evento('reloj_simulado')));
+    $modo = reloj_modo();
+    if ($modo === 'real') {
+        return new DateTimeImmutable('now');
     }
-    return new DateTimeImmutable('now');
+    $base = parse_fecha_hora(config_evento('reloj_base')) ?? parse_fecha_hora(config_evento('reloj_simulado'));
+    if ($base === null) {
+        return new DateTimeImmutable('now');
+    }
+    if ($modo === 'fijo') {
+        return $base;
+    }
+    $ancla = parse_fecha_hora(config_evento('reloj_ancla'));
+    if ($ancla === null) {
+        return $base;
+    }
+    $velocidad = max(1, (int) config_evento('reloj_velocidad', '1'));
+    $transcurrido = max(0, time() - $ancla->getTimestamp());
+    return $base->modify('+' . ($transcurrido * $velocidad) . ' seconds');
 }
 
 /* ============================================================
@@ -172,6 +228,8 @@ function icono(string $nombre): string
         'sitio'    => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 2.6 4 5.6 4 9s-1.2 6.4-4 9c-2.8-2.6-4-5.6-4-9s1.2-6.4 4-9z"/>',
         'ubicacion'=> '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/>',
         'reloj'    => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+        'usuario'  => '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.8 3.7-6 7.5-6s6.7 2.2 7.5 6"/>',
+        'salir'    => '<path d="M9 4.5H5.5v15H9"/><path d="M14 8l4 4-4 4M18 12H9.5"/>',
     ];
     $d = $trazos[$nombre] ?? '';
     return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $d . '</svg>';
@@ -417,3 +475,10 @@ function tarjeta_empresa(array $e): string
     }
     return $html . '</a>';
 }
+
+/* ============================================================
+   Sesiones, roles y CSRF
+   ============================================================ */
+
+require_once __DIR__ . '/auth.php';
+sesion_iniciar();

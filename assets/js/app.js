@@ -146,3 +146,44 @@
     }
   });
 })();
+
+/* ============================================================
+   Fase 2 — cuentas y reloj
+   ============================================================ */
+(function () {
+  "use strict";
+
+  /* Cuentas de demostración: al tocar una se llena el correo. */
+  document.querySelectorAll("[data-demo-correo]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var campo = document.getElementById("correo");
+      var clave = document.getElementById("clave");
+      if (campo) campo.value = b.getAttribute("data-demo-correo");
+      if (clave) clave.focus();
+    });
+  });
+
+  /* Reloj grande del panel admin: se mueve con la hora simulada. */
+  var reloj = document.querySelector("[data-reloj-evento]");
+  if (reloj) {
+    var modo = document.querySelector('input[name="modo"]:checked');
+    var vel = document.getElementById("velocidad");
+    var base = new Date(reloj.getAttribute("data-reloj-evento")).getTime();
+    var t0 = Date.now();
+    var pintar = function () {
+      var factor = modo && modo.value === "avance" ? parseInt(vel.value, 10) || 1 : modo && modo.value === "fijo" ? 0 : 1;
+      var d = new Date(base + (Date.now() - t0) * factor);
+      reloj.textContent = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    };
+    setInterval(pintar, 1000);
+  }
+
+  /* Botones "Saltar a un momento": llenan fecha y hora del formulario. */
+  document.querySelectorAll("[data-salto-fecha]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.getElementById("fecha").value = b.getAttribute("data-salto-fecha");
+      document.getElementById("hora").value = b.getAttribute("data-salto-hora");
+      document.getElementById("hora").focus();
+    });
+  });
+})();

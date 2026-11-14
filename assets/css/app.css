@@ -258,3 +258,94 @@ button, input, select, textarea { font-family: inherit; }
   .punto-vivo { animation: none; }
   .carrusel { scroll-behavior: auto; }
 }
+
+/* ============================================================
+   Fase 2 — cuentas, formularios y administración
+   ============================================================ */
+
+/* Barra superior: acceso a la cuenta */
+.app-entrar {
+  display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.8rem;
+  font-size: 0.78rem; font-weight: 700; text-decoration: none;
+  color: var(--blanco); background: var(--azul-profundo); border-radius: 999px;
+}
+.app-entrar .ico { width: 16px; height: 16px; }
+.app-entrar:hover { background: var(--azul-corp); }
+.app-usuario {
+  display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%;
+  font-size: 0.78rem; font-weight: 700; text-decoration: none;
+  background: var(--azul-profundo); color: var(--amarillo);
+}
+.app-usuario:hover { background: var(--azul-corp); }
+@media (max-width: 360px) { .app-sitio span { display: none; } }
+
+/* Formularios */
+.form-app { display: grid; gap: 1rem; margin: 1rem 0; }
+.campo { display: grid; gap: 0.35rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.campo label, .campo legend { font-size: 0.86rem; font-weight: 600; color: var(--azul-profundo); padding: 0; }
+.campo input[type="text"], .campo input[type="email"], .campo input[type="password"],
+.campo input[type="date"], .campo input[type="time"], .campo select {
+  width: 100%; padding: 0.8rem 0.9rem; font: inherit; color: var(--texto);
+  background: var(--blanco); border: 1.5px solid var(--borde-campo); border-radius: 10px;
+}
+.campo input:focus, .campo select:focus { outline: 3px solid var(--azul-corp); outline-offset: 1px; border-color: var(--azul-corp); }
+.campo [aria-invalid="true"] { border-color: var(--error); }
+.campo-error { margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--error-texto); }
+.fila-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.btn-app.ancho { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; }
+.btn-app .ico { width: 18px; height: 18px; }
+.centrado { text-align: center; font-size: 0.88rem; }
+
+.alerta { margin: 0.8rem 0; padding: 0.75rem 1rem; font-size: 0.86rem; font-weight: 600; border-radius: var(--radio-campo); }
+.alerta.error { background: var(--error-fondo); color: var(--error-texto); border: 1px solid var(--error); }
+.alerta.ok { background: var(--info-fondo); color: var(--info-texto); border: 1px solid var(--cian-nodo); }
+
+/* Casillas tipo "chip" (ejes de interés) */
+.grupo-checks { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.grupo-checks legend { width: 100%; margin-bottom: 0.2rem; }
+.check-chip { position: relative; }
+.check-chip input { position: absolute; opacity: 0; inset: 0; }
+.check-chip span {
+  display: inline-block; padding: 0.4rem 0.85rem; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  color: var(--azul-profundo); background: var(--blanco); border: 1.5px solid var(--borde-campo); border-radius: 999px;
+}
+.check-chip input:checked + span { background: var(--azul-profundo); border-color: var(--azul-profundo); color: var(--blanco); }
+.check-chip input:focus-visible + span { outline: 3px solid var(--azul-corp); outline-offset: 2px; }
+
+/* Opciones de radio con descripción */
+.opcion { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.7rem 0.8rem; margin-top: 0.4rem; font-weight: 400 !important; border: 1.5px solid var(--borde); border-radius: 12px; cursor: pointer; }
+.opcion input { margin-top: 0.3rem; width: 18px; height: 18px; accent-color: var(--azul-corp); flex: none; }
+.opcion span { font-size: 0.82rem; color: var(--texto-suave); }
+.opcion strong { display: block; font-size: 0.9rem; color: var(--azul-profundo); }
+.opcion:has(input:checked) { border-color: var(--azul-corp); background: var(--info-fondo); }
+
+/* Cuentas de demostración */
+.demo-cuentas { margin-top: 1.5rem; padding: 0.8rem 1rem; background: var(--fondo-alt); border-radius: var(--radio); }
+.demo-cuentas summary { font-weight: 700; font-size: 0.88rem; cursor: pointer; color: var(--azul-profundo); }
+.demo-cuentas ul { list-style: none; margin: 0.6rem 0 0; padding: 0; display: grid; gap: 0.4rem; }
+.demo-cuentas button {
+  display: block; width: 100%; padding: 0.55rem 0.8rem; text-align: left; cursor: pointer; font: inherit;
+  background: var(--blanco); border: 1px solid var(--borde); border-radius: 10px;
+}
+.demo-cuentas button:hover { border-color: var(--azul-corp); }
+.demo-cuentas button strong { display: block; font-size: 0.84rem; color: var(--azul-profundo); }
+.demo-cuentas button span { font-size: 0.76rem; color: var(--texto-suave); }
+
+/* Perfil */
+.perfil-cab { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+.perfil-cab h1 { margin: 0 0 0.35rem; font-size: 1.25rem; }
+.avatar.grande { width: 64px; height: 64px; font-size: 1.2rem; }
+
+/* Administración */
+.tarjeta.inactiva { opacity: 0.6; cursor: default; }
+.tarjeta.inactiva:hover { border-color: var(--borde); }
+.reloj-grande {
+  display: flex; align-items: center; gap: 1rem; margin: 1rem 0; padding: 1rem 1.2rem;
+  color: var(--blanco); border-radius: var(--radio);
+  background: linear-gradient(160deg, var(--azul-profundo), #1a2f7e 70%, var(--azul-corp));
+}
+.reloj-grande .ico { width: 38px; height: 38px; color: var(--amarillo); }
+.reloj-grande strong { display: block; font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.reloj-grande span { font-size: 0.85rem; color: #e4e7f6; }
+.atajos-reloj { display: grid; gap: 0.5rem; }
+.atajos-reloj .btn-app { text-align: left; }

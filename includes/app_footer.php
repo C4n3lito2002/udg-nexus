@@ -1,6 +1,7 @@
 <?php
 /** Cierre de la app móvil: barra de pestañas inferior + scripts. */
 $activa = $activa ?? '';
+$_app = prefijo_app();
 $tabs = [
     'inicio'   => ['Inicio',   'inicio.php'],
     'catalogo' => ['Catálogo', 'catalogo.php'],
@@ -13,13 +14,13 @@ $tabs = [
 
 <nav class="tabbar" aria-label="Navegación de la app">
   <?php foreach ($tabs as $clave => [$etiqueta, $url]): ?>
-    <a href="<?= h($url) ?>" <?= $activa === $clave ? 'aria-current="page"' : '' ?>>
+    <a href="<?= h($_app . $url) ?>" <?= $activa === $clave ? 'aria-current="page"' : '' ?>>
       <?= icono($clave) ?><span><?= h($etiqueta) ?></span>
     </a>
   <?php endforeach; ?>
 </nav>
 
 </div>
-<script src="../assets/js/app.js"></script>
+<script src="<?= h(prefijo_raiz()) ?>assets/js/app.js"></script>
 </body>
 </html>
