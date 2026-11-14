@@ -644,3 +644,4 @@ function agenda_alertas_pendientes(int $uid, DateTimeInterface $ahora): array
 require_once __DIR__ . '/auth.php';
 sesion_iniciar();
 require_once __DIR__ . '/boletos.php';
+require_once __DIR__ . '/avisos.php';

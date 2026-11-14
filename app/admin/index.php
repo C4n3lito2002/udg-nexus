@@ -20,11 +20,11 @@ require __DIR__ . '/../../includes/app_header.php';
     <h3>Reloj del evento</h3>
     <p>Hora que usa toda la app: <strong><?= h(fecha_larga($ahora)) ?>, <?= h(hora_corta($ahora)) ?></strong>. Cámbiala para mostrar cualquier momento del evento.</p>
   </a>
-  <div class="tarjeta inactiva" aria-disabled="true">
-    <div class="chips"><span class="chip">Próximamente</span></div>
-    <h3>Avisos</h3>
-    <p>Publicar avisos para todos o para un rol.</p>
-  </div>
+  <a class="tarjeta" href="avisos.php">
+    <div class="chips"><span class="chip oscuro">Avisos</span></div>
+    <h3>Avisos y notificaciones</h3>
+    <p>Publica avisos para todos o para un rol y mira cuántas personas los leyeron.</p>
+  </a>
   <a class="tarjeta" href="escaner.php">
     <div class="chips"><span class="chip oscuro">Staff</span></div>
     <h3>Escáner de acceso</h3>

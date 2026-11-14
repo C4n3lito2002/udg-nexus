@@ -94,6 +94,10 @@ ajusta la URL — también visible en MAMP → Preferencias → Ports.)
 - La app móvil (`/app`) incluye un **mapa del recinto** (`app/mapa.php`): plano SVG
   con zonas, stands y pines enlazados a las fichas de proyecto. Las coordenadas
   viven en la base; instrucciones de importación en `docs/FASE4.md`.
+- La app tiene un **centro de avisos** (`app/notificaciones.php`, con campana e insignia en la
+  barra) y un panel del administrador (`app/admin/avisos.php`) para publicar avisos a todos o a
+  un rol. Los avisos nuevos llegan al celular sin recargar (sondeo de `api/ahora.php`);
+  instrucciones de importación en `docs/FASE5.md`.
 - No se incluyen imágenes/fotos reales de personas, marcas o del CCU
   (por restricciones de derechos de imagen); el diseño usa solo
   tipografía, color y elementos gráficos propios.

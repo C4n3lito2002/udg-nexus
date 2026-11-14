@@ -207,6 +207,10 @@
   var metaCsrf = document.querySelector('meta[name="csrf"]');
   var CSRF = metaCsrf ? metaCsrf.getAttribute("content") : "";
 
+  /* Avisos (Fase 5): id más alto que la página ya conoce; el sondeo pide solo lo posterior. */
+  var avisoMax = parseInt(cuerpo.getAttribute("data-avisos-max"), 10);
+  if (isNaN(avisoMax)) avisoMax = null;
+
   var pad = function (n) { return (n < 10 ? "0" : "") + n; };
 
   /* 'AAAA-MM-DD HH:MM:SS' -> milisegundos "UTC" (solo sirve para comparar y sumar). */
@@ -360,11 +364,16 @@
     poner("[data-dia-evento]", d.dia ? " · Día " + d.dia : "");
     tick();
     if (LOGUEADO) pintarAlertas(d.alertas || []);
+    if (d.avisos) {
+      (d.avisos.nuevos || []).forEach(function (a) { if (avisoMax === null || a.id > avisoMax) avisoMax = a.id; });
+      document.dispatchEvent(new CustomEvent("nexus:avisos", { detail: d.avisos }));
+    }
   };
 
   var consultar = function () {
     if (document.hidden) return Promise.resolve();
-    return fetch(API + "ahora.php", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } })
+    var url = API + "ahora.php" + (LOGUEADO && avisoMax !== null ? "?av=" + avisoMax : "");
+    return fetch(url, { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } })
       .then(function (r) { return r.json(); })
       .then(procesar)
       .catch(function () {});
@@ -482,4 +491,280 @@
   });
 
   repintar();
+})();
+
+/* ============================================================
+   Fase 5 — avisos y notificaciones
+   El sondeo vive en el bloque de la agenda (api/ahora.php, cada 5 s): al recibir
+   datos de avisos emite el evento "nexus:avisos". Este bloque:
+     1. actualiza la insignia de la campana,
+     2. en el centro de avisos (data-avisos-lista) agrega los nuevos, quita los retirados
+        y marca como leído por AJAX,
+     3. en cualquier otra pantalla muestra una alerta "Nuevo aviso".
+   Todo el texto dinámico se escribe con textContent.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var cuerpo = document.body;
+  if (!cuerpo || !cuerpo.classList.contains("app") || cuerpo.getAttribute("data-sesion") !== "1") return;
+
+  var API = cuerpo.getAttribute("data-api") || "api/";
+  var APP = cuerpo.getAttribute("data-app") || "";
+  var metaCsrf = document.querySelector('meta[name="csrf"]');
+  var CSRF = metaCsrf ? metaCsrf.getAttribute("content") : "";
+  var lista = document.querySelector("[data-avisos-lista]");
+  var estado = document.querySelector("[data-avisos-estado]");
+  var resumen = document.querySelector("[data-avisos-resumen]");
+  var todos = document.querySelector("[data-avisos-todos]");
+  var vacio = document.querySelector("[data-avisos-vacio]");
+
+  var crear = function (tag, clase, texto) {
+    var el = document.createElement(tag);
+    if (clase) el.className = clase;
+    if (texto !== undefined) el.textContent = texto;
+    return el;
+  };
+  var anunciar = function (t) { if (estado) estado.textContent = t; };
+  var ICONO_OK = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16 9.5"/></svg>';
+  var ICONO_CAMPANA = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>';
+
+  /* ---------- Insignia de la campana ---------- */
+  var pintarInsignia = function (n) {
+    document.querySelectorAll("[data-badge-avisos]").forEach(function (b) {
+      b.textContent = n > 9 ? "9+" : String(n);
+      b.hidden = n === 0;
+    });
+    document.querySelectorAll("[data-avisos-enlace]").forEach(function (a) {
+      a.setAttribute("aria-label", "Avisos" + (n > 0 ? ", " + n + " sin leer" : ""));
+    });
+  };
+
+  /* ---------- Centro de avisos ---------- */
+  var tarjetas = function () { return lista ? lista.querySelectorAll("[data-aviso]") : []; };
+  var existe = function (id) { return lista && lista.querySelector('[data-aviso="' + id + '"]') !== null; };
+
+  var pintarResumen = function () {
+    if (!lista) return;
+    var total = tarjetas().length;
+    var sinLeer = lista.querySelectorAll(".aviso.no-leido").length;
+    if (resumen) {
+      resumen.textContent = total === 0 ? "No hay avisos por ahora."
+        : (sinLeer === 0 ? "Todo al día" : sinLeer + " sin leer") + " · " + total + (total === 1 ? " aviso" : " avisos");
+    }
+    if (todos) todos.hidden = sinLeer === 0;
+    if (vacio) vacio.hidden = total > 0;
+  };
+
+  var tarjetaAviso = function (a) {
+    var art = crear("article", "aviso " + (a.leido ? "leido" : "no-leido") + (a.nivel === "importante" ? " importante" : ""));
+    art.setAttribute("data-aviso", String(a.id));
+    var chips = crear("div", "chips");
+    if (!a.leido) { var c = crear("span", "chip inv", "Sin leer"); c.setAttribute("data-chip-nuevo", ""); chips.appendChild(c); }
+    if (a.nivel === "importante") chips.appendChild(crear("span", "chip oscuro", "Importante"));
+    if (a.para) chips.appendChild(crear("span", "chip", "Para: " + a.para));
+    art.appendChild(chips);
+    art.appendChild(crear("h2", "", a.titulo));
+    art.appendChild(crear("p", "aviso-cuerpo", a.cuerpo));
+    var pie = crear("div", "aviso-pie");
+    pie.appendChild(crear("small", "", a.publicada));
+    if (!a.leido) {
+      var f = crear("form");
+      f.method = "post";
+      f.action = "notificaciones.php";
+      f.setAttribute("data-form-leer", "");
+      [["csrf", CSRF], ["accion", "leer"], ["id", String(a.id)]].forEach(function (par) {
+        var i = crear("input"); i.type = "hidden"; i.name = par[0]; i.value = par[1]; f.appendChild(i);
+      });
+      var b = crear("button", "aviso-leer", "Marcar como leído");
+      b.type = "submit";
+      b.setAttribute("data-avisos-leer", "");
+      f.appendChild(b);
+      pie.appendChild(f);
+    } else {
+      var ok = crear("span", "aviso-ok"); ok.innerHTML = ICONO_OK; ok.appendChild(document.createTextNode(" Leído")); pie.appendChild(ok);
+    }
+    art.appendChild(pie);
+    return art;
+  };
+
+  var marcarTarjetaLeida = function (art) {
+    art.classList.remove("no-leido");
+    art.classList.add("leido");
+    var chip = art.querySelector("[data-chip-nuevo]");
+    if (chip) chip.remove();
+    var f = art.querySelector("[data-form-leer]");
+    if (f) {
+      var ok = crear("span", "aviso-ok");
+      ok.innerHTML = ICONO_OK;
+      ok.appendChild(document.createTextNode(" Leído"));
+      f.replaceWith(ok);
+    }
+  };
+
+  var postAvisos = function (params) {
+    var datos = new URLSearchParams();
+    Object.keys(params).forEach(function (k) { datos.append(k, params[k]); });
+    datos.append("csrf", CSRF);
+    return fetch(API + "avisos.php", {
+      method: "POST", credentials: "same-origin", headers: { Accept: "application/json" }, body: datos
+    }).then(function (r) { return r.json().then(function (d) { d.estadoHttp = r.status; return d; }); });
+  };
+
+  if (lista) {
+    lista.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-avisos-leer]");
+      if (!btn) return;
+      e.preventDefault();
+      var art = btn.closest("[data-aviso]");
+      btn.disabled = true;
+      postAvisos({ accion: "leer", id: art.getAttribute("data-aviso") }).then(function (d) {
+        if (d.estadoHttp === 401) { window.location.href = APP + "login.php?volver=" + encodeURIComponent(window.location.pathname); return; }
+        if (!d.ok) { btn.disabled = false; anunciar(d.error || "No se pudo guardar el cambio."); if (d.estadoHttp === 404) { art.remove(); pintarResumen(); } return; }
+        marcarTarjetaLeida(art);
+        pintarInsignia(d.no_leidos);
+        pintarResumen();
+        anunciar(d.mensaje);
+      }).catch(function () {
+        btn.disabled = false;
+        anunciar("No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.");
+      });
+    });
+  }
+
+  if (todos) {
+    todos.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var btn = todos.querySelector("button");
+      btn.disabled = true;
+      postAvisos({ accion: "leer_todos" }).then(function (d) {
+        btn.disabled = false;
+        if (!d.ok) { anunciar(d.error || "No se pudo guardar el cambio."); return; }
+        tarjetas().forEach(marcarTarjetaLeida);
+        pintarInsignia(d.no_leidos);
+        pintarResumen();
+        anunciar(d.mensaje);
+      }).catch(function () {
+        btn.disabled = false;
+        anunciar("No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.");
+      });
+    });
+  }
+
+  /* ---------- Alerta "Nuevo aviso" (en las demás pantallas) ---------- */
+  var contenedor = null;
+  var toasts = {};
+  var cerrados = {};
+
+  var zona = function () {
+    if (!contenedor) {
+      contenedor = document.querySelector(".alertas-app");
+      if (!contenedor) {
+        contenedor = crear("div", "alertas-app");
+        contenedor.setAttribute("role", "region");
+        contenedor.setAttribute("aria-label", "Alertas");
+        (document.querySelector(".app-shell") || cuerpo).appendChild(contenedor);
+      }
+    }
+    return contenedor;
+  };
+
+  var cerrarToast = function (id) {
+    if (toasts[id]) { toasts[id].remove(); delete toasts[id]; }
+    cerrados[id] = true;
+  };
+
+  var toastAviso = function (a) {
+    if (toasts[a.id] || cerrados[a.id]) return;
+    var t = crear("div", "alerta-toast aviso-nuevo" + (a.nivel === "importante" ? " importante" : ""));
+    t.setAttribute("role", "alert");
+    var etq = crear("span", "etq");
+    etq.innerHTML = ICONO_CAMPANA;
+    etq.appendChild(document.createTextNode(a.nivel === "importante" ? "Aviso importante" : "Nuevo aviso"));
+    t.appendChild(etq);
+    t.appendChild(crear("strong", "", a.titulo));
+    var resto = a.cuerpo.length > 140 ? a.cuerpo.slice(0, 137).replace(/\s+\S*$/, "") + "…" : a.cuerpo;
+    t.appendChild(crear("p", "", resto));
+    var botones = crear("div", "botones");
+    var ver = crear("a", "", "Ver avisos");
+    ver.href = APP + "notificaciones.php";
+    var cerrar = crear("button", "", "Cerrar");
+    cerrar.type = "button";
+    cerrar.addEventListener("click", function () { cerrarToast(a.id); });
+    botones.appendChild(ver);
+    botones.appendChild(cerrar);
+    t.appendChild(botones);
+    zona().appendChild(t);
+    toasts[a.id] = t;
+  };
+
+  /* ---------- Datos del sondeo ---------- */
+  document.addEventListener("nexus:avisos", function (e) {
+    var d = e.detail || {};
+    pintarInsignia(d.no_leidos || 0);
+
+    if (lista) {
+      var visibles = {};
+      (d.visibles || []).forEach(function (id) { visibles[id] = true; });
+      var quitados = 0;
+      tarjetas().forEach(function (art) {
+        if (!visibles[art.getAttribute("data-aviso")]) { art.remove(); quitados++; }
+      });
+      var agregados = 0;
+      (d.nuevos || []).forEach(function (a) {
+        if (existe(a.id)) return;
+        var art = tarjetaAviso(a);
+        art.classList.add("entra");
+        lista.insertBefore(art, lista.firstChild);
+        agregados++;
+      });
+      pintarResumen();
+      if (agregados) anunciar(agregados === 1 ? "Llegó un aviso nuevo." : "Llegaron " + agregados + " avisos nuevos.");
+      else if (quitados) anunciar(quitados === 1 ? "Se retiró un aviso." : "Se retiraron " + quitados + " avisos.");
+    } else {
+      (d.nuevos || []).forEach(toastAviso);
+      /* Si un aviso se retiró mientras su alerta seguía en pantalla, la alerta se va con él. */
+      var vis = {};
+      (d.visibles || []).forEach(function (id) { vis[id] = true; });
+      Object.keys(toasts).forEach(function (id) { if (!vis[id]) { toasts[id].remove(); delete toasts[id]; } });
+    }
+  });
+})();
+
+/* ============================================================
+   Fase 5 — formularios del panel de avisos
+   1. Contador de caracteres (data-contador="máximo").
+   2. Doble envío: el botón se deshabilita al enviar (form[data-una-vez]) y se
+      rehabilita si la persona regresa con "atrás". El servidor es quien garantiza
+      que no se duplique (token de un solo uso); esto solo evita el segundo clic.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  document.querySelectorAll("[data-contador]").forEach(function (campo) {
+    var max = parseInt(campo.getAttribute("data-contador"), 10);
+    var salida = document.getElementById(campo.id + "-cont");
+    if (!salida || isNaN(max)) return;
+    var pintar = function () {
+      var n = campo.value.length;
+      salida.textContent = n + "/" + max;
+      salida.classList.toggle("exceso", n > max);
+    };
+    campo.addEventListener("input", pintar);
+    pintar();
+  });
+
+  document.querySelectorAll("form[data-una-vez]").forEach(function (form) {
+    var boton = form.querySelector('button[type="submit"]');
+    if (!boton) return;
+    var texto = boton.textContent;
+    form.addEventListener("submit", function () {
+      boton.disabled = true;
+      boton.textContent = "Enviando…";
+    });
+    window.addEventListener("pageshow", function () {
+      boton.disabled = false;
+      boton.textContent = texto;
+    });
+  });
 })();

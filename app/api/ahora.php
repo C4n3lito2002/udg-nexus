@@ -6,6 +6,11 @@
  *   dia (1, 2, 3 o null), modo (real|fijo|avance), velocidad (0 = quieto, 1 = tiempo real, 60 = x60...),
  *   simulado (bool), logueado (bool), alertas [{id, titulo, zona, hora_inicio, minutos, mensaje}]
  * Las alertas solo se calculan si hay sesión y la migración 004 está importada.
+ *
+ * Avisos (Fase 5): con sesión y la migración 007, agrega  avisos { no_leidos, visibles[], nuevos[] }.
+ * ?av=N  (id más alto que la página ya conoce) pide además los avisos con id > N en "nuevos";
+ * sin ?av solo se devuelven el conteo y los ids visibles. Así el sondeo de la agenda sirve también
+ * para los avisos y no hace falta un segundo temporizador.
  */
 require_once __DIR__ . '/../../includes/app.php';
 
@@ -19,6 +24,13 @@ $usuario = usuario_actual();
 $alertas = [];
 if ($usuario !== null && agenda_tabla_existe()) {
     $alertas = agenda_alertas_pendientes((int) $usuario['id'], $ahora);
+}
+
+$avisos = null;
+if ($usuario !== null && avisos_tablas_existen()) {
+    $av = $_GET['av'] ?? null;
+    $desde = (is_string($av) && ctype_digit($av) && strlen($av) < 10) ? (int) $av : null;
+    $avisos = avisos_para_sondeo($usuario, $desde);
 }
 
 // Esta página se consulta sin parar: se libera la sesión para no bloquear otras peticiones.
@@ -37,4 +49,5 @@ echo json_encode([
     'simulado'  => reloj_simulado_activo(),
     'logueado'  => $usuario !== null,
     'alertas'   => $alertas,
+    'avisos'    => $avisos,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

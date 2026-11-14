@@ -668,3 +668,72 @@ span.btn-app[aria-disabled="true"]:hover { background: var(--blanco); color: var
 .btn-app.mapa-ver { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.7rem; }
 .btn-app.mapa-ver .ico { width: 20px; height: 20px; }
 .enlace-mapa { font-weight: 600; }
+
+/* ============================================================
+   Fase 5 — avisos y notificaciones
+   ============================================================ */
+
+/* Campana en la barra superior (con insignia de no leídos) */
+.app-avisos {
+  position: relative; display: grid; place-items: center; flex: none; width: 36px; height: 36px;
+  border-radius: 50%; color: var(--azul-profundo); background: var(--fondo-alt); text-decoration: none;
+}
+.app-avisos:hover { background: var(--info-fondo); }
+.app-avisos .ico { width: 20px; height: 20px; }
+.avisos-badge {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px;
+  display: grid; place-items: center; font-size: 0.68rem; font-weight: 700; line-height: 1;
+  color: var(--azul-profundo); background: var(--amarillo); border: 2px solid var(--blanco); border-radius: 999px;
+}
+.avisos-badge[hidden] { display: none; }
+
+/* Centro de avisos */
+.avisos-todos { margin: 0.8rem 0; }
+.avisos-todos[hidden], .avisos-lista [hidden] { display: none; }
+.aviso { padding: 0.9rem 1rem; background: var(--blanco); border: 1.5px solid var(--borde); border-radius: var(--radio); }
+.aviso.no-leido { border-color: var(--azul-corp); border-left: 6px solid var(--amarillo); box-shadow: 0 6px 18px rgba(20, 15, 83, 0.1); }
+.aviso.leido { background: var(--fondo-alt); }
+.aviso h2 { margin: 0.45rem 0 0.25rem; font-size: 1rem; color: var(--azul-profundo); overflow-wrap: anywhere; }
+.aviso.leido h2 { font-weight: 600; }
+.aviso-cuerpo { margin: 0 0 0.65rem; font-size: 0.86rem; color: var(--texto-suave); white-space: pre-line; overflow-wrap: anywhere; }
+.aviso-pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.aviso-pie small { font-size: 0.74rem; color: var(--texto-suave); }
+.aviso-pie form { margin: 0; }
+.aviso-leer {
+  padding: 0.45rem 0.85rem; font: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  color: var(--azul-profundo); background: var(--blanco); border: 2px solid var(--azul-profundo); border-radius: 9px;
+}
+.aviso-leer:hover { color: var(--blanco); background: var(--azul-corp); border-color: var(--azul-corp); }
+.aviso-leer:disabled { opacity: 0.6; cursor: wait; }
+.aviso-ok { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; font-weight: 600; color: var(--info-texto); }
+.aviso-ok .ico { width: 16px; height: 16px; }
+.aviso.entra { animation: entra-toast 0.3s ease-out; }
+.alerta-toast.aviso-nuevo { border-left-color: var(--cian-nodo); }
+.alerta-toast.aviso-nuevo.importante { border-left-color: var(--amarillo); }
+
+/* Panel del administrador */
+.campo textarea {
+  width: 100%; min-height: 7.5rem; padding: 0.8rem 0.9rem; font: inherit; line-height: 1.45; color: var(--texto);
+  resize: vertical; background: var(--blanco); border: 1.5px solid var(--borde-campo); border-radius: 10px;
+}
+.campo textarea:focus { outline: 3px solid var(--azul-corp); outline-offset: 1px; border-color: var(--azul-corp); }
+.campo input[type="text"][aria-invalid="true"], .campo textarea[aria-invalid="true"], .campo select[aria-invalid="true"] { border-color: var(--error); }
+.contador { margin: 0; font-size: 0.74rem; text-align: right; color: var(--texto-suave); }
+.contador.exceso { color: var(--error-texto); font-weight: 700; }
+.aviso-adm { padding: 0.9rem 1rem; background: var(--blanco); border: 1.5px solid var(--borde); border-radius: var(--radio); }
+.aviso-adm h3 { margin: 0.45rem 0 0.2rem; font-size: 0.98rem; color: var(--azul-profundo); overflow-wrap: anywhere; }
+.aviso-adm p { margin: 0 0 0.5rem; font-size: 0.84rem; color: var(--texto-suave); white-space: pre-line; overflow-wrap: anywhere; }
+.aviso-adm .meta { font-size: 0.74rem; color: var(--texto-suave); }
+.aviso-adm.retirado { background: var(--fondo-alt); opacity: 0.85; }
+.lectura { margin: 0.5rem 0; }
+.lectura strong { font-size: 0.82rem; color: var(--azul-profundo); font-variant-numeric: tabular-nums; }
+.lectura-barra { height: 8px; margin-top: 0.3rem; overflow: hidden; background: var(--borde); border-radius: 999px; }
+.lectura-barra span { display: block; height: 100%; background: var(--azul-corp); border-radius: 999px; }
+.aviso-adm .acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.btn-app.peligro { color: var(--error-texto); border-color: var(--error); }
+.btn-app.peligro:hover { color: var(--blanco); background: var(--error); border-color: var(--error); }
+.btn-app.pequeno-btn { padding: 0.5rem 0.9rem; font-size: 0.82rem; }
+.confirmar-retiro { padding: 1rem; margin: 1rem 0; background: var(--aviso-fondo); border: 1.5px solid var(--ambar); border-radius: var(--radio); }
+.confirmar-retiro h2 { margin: 0 0 0.4rem; font-size: 1rem; }
+.confirmar-retiro .acciones { display: grid; gap: 0.5rem; margin-top: 0.8rem; }
+@media (prefers-reduced-motion: reduce) { .aviso.entra { animation: none; } }
