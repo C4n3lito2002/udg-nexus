@@ -91,6 +91,9 @@ ajusta la URL — también visible en MAMP → Preferencias → Ports.)
   formularios reales". Si más adelante quieres un panel simple para ver
   los registros desde el navegador (en vez de phpMyAdmin), dímelo y lo
   agregamos.
+- La app móvil (`/app`) incluye un **mapa del recinto** (`app/mapa.php`): plano SVG
+  con zonas, stands y pines enlazados a las fichas de proyecto. Las coordenadas
+  viven en la base; instrucciones de importación en `docs/FASE4.md`.
 - No se incluyen imágenes/fotos reales de personas, marcas o del CCU
   (por restricciones de derechos de imagen); el diseño usa solo
   tipografía, color y elementos gráficos propios.

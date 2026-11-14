@@ -52,7 +52,10 @@ function tarjeta_agenda(array $a, ?array $g, DateTimeImmutable $ahora, ?array $u
     $h .= '<div class="chips"><span class="estado ' . h($clase) . '" data-estado' . ($etiqueta === '' ? ' hidden' : '') . '>' . h($etiqueta) . '</span>'
         . '<span class="chip ok" data-chip-agenda' . ($enAgenda ? '' : ' hidden') . '>En tu agenda</span></div>';
     $h .= '<h3>' . h($a['titulo']) . '</h3>';
-    $h .= '<span class="meta">' . h($a['tipo']) . ' · ' . h($a['zona']) . '</span>';
+    $zonaTxt = !empty($a['zona_id'])
+        ? '<a class="enlace-mapa" href="mapa.php?zona=' . (int) $a['zona_id'] . '">' . h($a['zona']) . '</a>'
+        : h($a['zona']);
+    $h .= '<span class="meta">' . h($a['tipo']) . ' · ' . $zonaTxt . '</span>';
     if (!empty($a['ponente'])) {
         $h .= '<span class="meta">' . h($a['ponente']) . '</span>';
     }

@@ -6,7 +6,7 @@ $tabs = [
     'inicio'   => ['Inicio',   'inicio.php'],
     'catalogo' => ['Catálogo', 'catalogo.php'],
     'agenda'   => ['Agenda',   'agenda.php'],
-    'mapa'     => ['Mapa',     'proximamente.php?m=mapa'],
+    'mapa'     => ['Mapa',     'mapa.php'],
     'gafete'   => ['Gafete',   'gafete.php'],
 ];
 ?>

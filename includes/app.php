@@ -352,7 +352,7 @@ function actividades_ahora(DateTimeInterface $ahora, int $ventanaMin = 60): arra
     $desde = $ahora->format('Y-m-d H:i:s');
     $hasta = $ahora->modify('+' . $ventanaMin . ' minutes')->format('Y-m-d H:i:s');
     return consulta(
-        'SELECT a.id, a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.nombre AS zona
+        'SELECT a.id, a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.id AS zona_id, z.nombre AS zona
          FROM actividades a JOIN zonas z ON z.id = a.zona_id
          WHERE (a.inicio <= ? AND a.fin > ?) OR (a.inicio > ? AND a.inicio <= ?)
          ORDER BY a.inicio, a.id',
@@ -365,7 +365,7 @@ function actividades_ahora(DateTimeInterface $ahora, int $ventanaMin = 60): arra
 function actividades_proximas(DateTimeInterface $ahora, int $limite = 3): array
 {
     return consulta(
-        'SELECT a.id, a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.nombre AS zona
+        'SELECT a.id, a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.id AS zona_id, z.nombre AS zona
          FROM actividades a JOIN zonas z ON z.id = a.zona_id
          WHERE a.inicio > ? ORDER BY a.inicio, a.id LIMIT ' . (int) $limite,
         's',
@@ -532,7 +532,7 @@ function agenda_usuario(int $uid): array
 {
     return consulta(
         'SELECT g.actividad_id AS id, g.alerta_minutos, g.alerta_vista,
-                a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.nombre AS zona
+                a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.id AS zona_id, z.nombre AS zona
          FROM agenda_usuario g
          JOIN actividades a ON a.id = g.actividad_id
          JOIN zonas z ON z.id = a.zona_id

@@ -44,7 +44,7 @@ require __DIR__ . '/../includes/app_header.php';
 
 <nav class="atajos" aria-label="Accesos directos">
   <a class="atajo" href="gafete.php"><span class="circulo"><?= icono('gafete') ?></span>Gafete QR</a>
-  <a class="atajo" href="proximamente.php?m=mapa"><span class="circulo"><?= icono('mapa') ?></span>Mapa</a>
+  <a class="atajo" href="mapa.php"><span class="circulo"><?= icono('mapa') ?></span>Mapa</a>
   <a class="atajo" href="catalogo.php"><span class="circulo"><?= icono('catalogo') ?></span>Catálogo</a>
   <a class="atajo" href="agenda.php?ver=mia"><span class="circulo"><?= icono('agenda') ?></span>Mi agenda</a>
 </nav>
@@ -64,7 +64,7 @@ require __DIR__ . '/../includes/app_header.php';
           <article class="act <?= h($clase) ?>">
             <span class="estado <?= h($clase) ?>"><?= h($etiqueta) ?></span>
             <h3><?= h($a['titulo']) ?></h3>
-            <span class="meta"><?= h($a['tipo']) ?> · <?= h($a['zona']) ?></span>
+            <span class="meta"><?= h($a['tipo']) ?> · <?= !empty($a['zona_id']) ? '<a class="enlace-mapa" href="mapa.php?zona=' . (int) $a['zona_id'] . '">' . icono('ubicacion') . h($a['zona']) . '</a>' : h($a['zona']) ?></span>
             <span class="meta"><?= h($detalle) ?></span>
           </article>
         <?php endforeach; ?>

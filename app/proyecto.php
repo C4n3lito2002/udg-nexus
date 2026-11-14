@@ -84,6 +84,9 @@ require __DIR__ . '/../includes/app_header.php';
       <?= icono('ubicacion') ?>
       <div><?= h($p['zona'] ?? '') ?><?= $p['stand'] ? ' · Stand ' . h($p['stand']) : '' ?><small>Plaza Bicentenario, CCU</small></div>
     </div>
+    <?php if (!empty($p['mapa_x'])): ?>
+      <a class="btn-app mapa-ver" href="mapa.php?proyecto=<?= (int) $p['id'] ?>"><?= icono('mapa') ?>Ver en el mapa</a>
+    <?php endif; ?>
   </section>
   <?php endif; ?>
 
