@@ -157,11 +157,17 @@ function csrf_campo(): string
     return '<input type="hidden" name="csrf" value="' . h(csrf_token()) . '">';
 }
 
+/** True si el token enviado en $_POST['csrf'] coincide con el de la sesión. */
+function csrf_valido(): bool
+{
+    $enviado = (string) ($_POST['csrf'] ?? '');
+    return $enviado !== '' && hash_equals(csrf_token(), $enviado);
+}
+
 /** Detiene la petición si el token del formulario no coincide. */
 function csrf_validar(): void
 {
-    $enviado = (string) ($_POST['csrf'] ?? '');
-    if ($enviado === '' || !hash_equals(csrf_token(), $enviado)) {
+    if (!csrf_valido()) {
         http_response_code(400);
         exit('La sesión del formulario expiró. Regresa, recarga la página e inténtalo de nuevo.');
     }

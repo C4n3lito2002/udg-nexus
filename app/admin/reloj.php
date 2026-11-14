@@ -36,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       && guardar_config('reloj_velocidad', (string) $velocidad);
         }
         if ($ok) {
+            if (agenda_tabla_existe()) {
+                ejecutar('UPDATE agenda_usuario SET alerta_vista = 0');   // re-arma las alertas de la demo
+            }
             header('Location: reloj.php?ok=1');
             exit;
         }

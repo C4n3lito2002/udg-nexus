@@ -230,6 +230,9 @@ function icono(string $nombre): string
         'reloj'    => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         'usuario'  => '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.8 3.7-6 7.5-6s6.7 2.2 7.5 6"/>',
         'salir'    => '<path d="M9 4.5H5.5v15H9"/><path d="M14 8l4 4-4 4M18 12H9.5"/>',
+        'alerta'   => '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+        'ok'       => '<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16 9.5"/>',
+        'aviso'    => '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',
     ];
     $d = $trazos[$nombre] ?? '';
     return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $d . '</svg>';
@@ -474,6 +477,162 @@ function tarjeta_empresa(array $e): string
         $html .= '<div class="pie"><span><strong>Busca:</strong> ' . h($e['busca']) . '</span></div>';
     }
     return $html . '</a>';
+}
+
+/* ============================================================
+   Agenda personal con alertas (Fase 2, parte 2)
+   Todo se calcula con el RELOJ DEL EVENTO (ahora_evento()), no con
+   la hora real, para que la demo funcione en cualquier fecha.
+   ============================================================ */
+
+/** Minutos de aviso permitidos antes del inicio de una actividad. */
+const ALERTAS_VALIDAS = [15, 30, 60];
+
+/** True si ya se importó db/migraciones/004_agenda.sql. */
+function agenda_tabla_existe(): bool
+{
+    static $existe = null;
+    if ($existe === null) {
+        $existe = consulta("SHOW TABLES LIKE 'agenda_usuario'") !== [];
+    }
+    return $existe;
+}
+
+/** Días del evento: [['n' => 1, 'fecha' => DateTimeImmutable], ...]. */
+function agenda_fechas(): array
+{
+    $d0 = new DateTimeImmutable((string) config_evento('evento_inicio', '2027-03-10'));
+    $total = max(1, (int) config_evento('evento_dias', '3'));
+    $dias = [];
+    for ($i = 0; $i < $total; $i++) {
+        $dias[] = ['n' => $i + 1, 'fecha' => $d0->modify('+' . $i . ' days')];
+    }
+    return $dias;
+}
+
+/** Actividades que empiezan en un día, con su zona. */
+function actividades_del_dia(DateTimeInterface $dia): array
+{
+    $d = $dia->format('Y-m-d');
+    $sig = (new DateTimeImmutable($d))->modify('+1 day')->format('Y-m-d');
+    return consulta(
+        'SELECT a.id, a.titulo, a.tipo, a.ponente, a.inicio, a.fin, a.cupo, z.id AS zona_id, z.nombre AS zona
+         FROM actividades a JOIN zonas z ON z.id = a.zona_id
+         WHERE a.inicio >= ? AND a.inicio < ?
+         ORDER BY a.inicio, a.id',
+        'ss',
+        [$d . ' 00:00:00', $sig . ' 00:00:00']
+    );
+}
+
+/** Agenda de una persona, en orden cronológico. */
+function agenda_usuario(int $uid): array
+{
+    return consulta(
+        'SELECT g.actividad_id AS id, g.alerta_minutos, g.alerta_vista,
+                a.titulo, a.tipo, a.ponente, a.inicio, a.fin, z.nombre AS zona
+         FROM agenda_usuario g
+         JOIN actividades a ON a.id = g.actividad_id
+         JOIN zonas z ON z.id = a.zona_id
+         WHERE g.usuario_id = ?
+         ORDER BY a.inicio, a.id',
+        'i',
+        [$uid]
+    );
+}
+
+/** Dos actividades se empalman si una empieza antes de que la otra termine. */
+function actividades_se_empalman(array $a, array $b): bool
+{
+    return $a['inicio'] < $b['fin'] && $b['inicio'] < $a['fin'];
+}
+
+/** Elementos de $agenda que se empalman con la actividad $a (sin contarse a sí misma). */
+function agenda_choca_con(array $a, array $agenda): array
+{
+    $res = [];
+    foreach ($agenda as $o) {
+        if ((int) $o['id'] !== (int) $a['id'] && actividades_se_empalman($a, $o)) {
+            $res[] = $o;
+        }
+    }
+    return $res;
+}
+
+/** Texto del aviso de empalme (el mismo que arma app.js al agregar o quitar). */
+function agenda_texto_choque(array $choca, bool $enAgenda): string
+{
+    if (!$choca) {
+        return '';
+    }
+    $partes = array_map(static function ($o) {
+        return '«' . $o['titulo'] . '» (' . hora_corta(new DateTimeImmutable($o['inicio']))
+             . ' a ' . hora_corta(new DateTimeImmutable($o['fin'])) . ')';
+    }, $choca);
+    return ($enAgenda ? 'Se empalma con ' : 'Si la agregas, se empalma con ') . implode(' y ', $partes) . '.';
+}
+
+/** Cuántos empalmes (pares) hay dentro de una agenda. */
+function agenda_total_empalmes(array $agenda): int
+{
+    $n = 0;
+    foreach ($agenda as $i => $a) {
+        foreach ($agenda as $j => $b) {
+            if ($j > $i && actividades_se_empalman($a, $b)) {
+                $n++;
+            }
+        }
+    }
+    return $n;
+}
+
+/** Datos mínimos de la agenda para la página y la API (JSON). */
+function agenda_para_js(array $agenda): array
+{
+    return array_map(static fn($g) => [
+        'id'     => (int) $g['id'],
+        'titulo' => $g['titulo'],
+        'inicio' => $g['inicio'],
+        'fin'    => $g['fin'],
+        'alerta' => $g['alerta_minutos'] !== null ? (int) $g['alerta_minutos'] : null,
+    ], $agenda);
+}
+
+/**
+ * Alertas que ya "tocan" según el reloj del evento y que la persona no ha visto:
+ * la alerta se abre (inicio - minutos) y se cierra cuando termina la actividad.
+ */
+function agenda_alertas_pendientes(int $uid, DateTimeInterface $ahora): array
+{
+    $t = $ahora->format('Y-m-d H:i:s');
+    $filas = consulta(
+        'SELECT g.actividad_id AS id, g.alerta_minutos, a.titulo, a.inicio, a.fin, z.nombre AS zona
+         FROM agenda_usuario g
+         JOIN actividades a ON a.id = g.actividad_id
+         JOIN zonas z ON z.id = a.zona_id
+         WHERE g.usuario_id = ? AND g.alerta_minutos IS NOT NULL AND g.alerta_vista = 0
+           AND a.fin > ? AND DATE_SUB(a.inicio, INTERVAL g.alerta_minutos MINUTE) <= ?
+         ORDER BY a.inicio, a.id',
+        'iss',
+        [$uid, $t, $t]
+    );
+    $alertas = [];
+    foreach ($filas as $f) {
+        $ini = new DateTimeImmutable($f['inicio']);
+        $enCurso = $ahora >= $ini;
+        $min = $enCurso ? 0 : (int) ceil(($ini->getTimestamp() - $ahora->getTimestamp()) / 60);
+        $alertas[] = [
+            'id'          => (int) $f['id'],
+            'titulo'      => $f['titulo'],
+            'zona'        => $f['zona'],
+            'hora_inicio' => hora_corta($ini),
+            'minutos'     => $min,
+            'mensaje'     => $enCurso
+                ? 'Ya empezó a las ' . hora_corta($ini) . '.'
+                : 'Empieza en ' . $min . ' min, a las ' . hora_corta($ini) . '.',
+        ];
+    }
+    return $alertas;
 }
 
 /* ============================================================

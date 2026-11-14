@@ -5,7 +5,7 @@ $_app = prefijo_app();
 $tabs = [
     'inicio'   => ['Inicio',   'inicio.php'],
     'catalogo' => ['Catálogo', 'catalogo.php'],
-    'agenda'   => ['Agenda',   'proximamente.php?m=agenda'],
+    'agenda'   => ['Agenda',   'agenda.php'],
     'mapa'     => ['Mapa',     'proximamente.php?m=mapa'],
     'gafete'   => ['Gafete',   'proximamente.php?m=gafete'],
 ];
@@ -16,6 +16,7 @@ $tabs = [
   <?php foreach ($tabs as $clave => [$etiqueta, $url]): ?>
     <a href="<?= h($_app . $url) ?>" <?= $activa === $clave ? 'aria-current="page"' : '' ?>>
       <?= icono($clave) ?><span><?= h($etiqueta) ?></span>
+      <?php if ($clave === 'agenda'): ?><b class="tab-badge" data-badge-agenda hidden></b><?php endif; ?>
     </a>
   <?php endforeach; ?>
 </nav>

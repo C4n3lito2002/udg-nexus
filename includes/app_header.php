@@ -20,12 +20,14 @@ $_usr  = usuario_actual();
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title><?= h($titulo) ?> — UDG NEXUS</title>
 <meta name="theme-color" content="#140f53">
+<?php if ($_usr): ?><meta name="csrf" content="<?= h(csrf_token()) ?>">
+<?php endif; ?>
 <link rel="preload" href="<?= h($_raiz) ?>assets/fonts/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="<?= h($_raiz) ?>assets/fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= h($_raiz) ?>assets/css/tokens.css">
 <link rel="stylesheet" href="<?= h($_raiz) ?>assets/css/app.css">
 </head>
-<body class="app">
+<body class="app" data-api="<?= h($_app) ?>api/" data-app="<?= h($_app) ?>" data-sesion="<?= $_usr ? '1' : '0' ?>">
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 <div class="app-shell">
 

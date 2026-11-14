@@ -349,3 +349,105 @@ button, input, select, textarea { font-family: inherit; }
 .reloj-grande span { font-size: 0.85rem; color: #e4e7f6; }
 .atajos-reloj { display: grid; gap: 0.5rem; }
 .atajos-reloj .btn-app { text-align: left; }
+
+/* ============================================================
+   Fase 2, parte 2 — agenda personal y alertas
+   ============================================================ */
+
+/* Selector de día */
+.dias { display: flex; gap: 0.5rem; overflow-x: auto; margin: 0.2rem -1rem 0.9rem; padding: 0 1rem 0.3rem; scrollbar-width: none; }
+.dias::-webkit-scrollbar { display: none; }
+.dias a {
+  flex: 1 0 auto; padding: 0.5rem 0.9rem; text-align: center; text-decoration: none; line-height: 1.25;
+  font-size: 0.86rem; font-weight: 700; color: var(--azul-profundo);
+  background: var(--blanco); border: 1.5px solid var(--borde); border-radius: 12px;
+}
+.dias a small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--texto-suave); }
+.dias a[aria-current="page"] { background: var(--azul-profundo); border-color: var(--azul-profundo); color: var(--blanco); }
+.dias a[aria-current="page"] small { color: #e4e7f6; }
+
+/* Listas y encabezados por zona o por día */
+.agenda-lista { display: grid; gap: 0.7rem; }
+.zona-grupo, .dia-grupo { margin-top: 1.2rem; }
+.zona-tit { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.6rem; font-size: 0.98rem; color: var(--azul-profundo); }
+.zona-tit .ico { width: 18px; height: 18px; color: var(--azul-corp); }
+
+/* Tarjeta de actividad */
+.act-ag {
+  display: grid; grid-template-columns: 54px 1fr; gap: 0.8rem; padding: 0.9rem;
+  background: var(--blanco); border: 1px solid var(--borde); border-left: 5px solid var(--cian-nodo); border-radius: var(--radio);
+}
+.act-ag.en-curso { border-left-color: var(--amarillo); }
+.act-ag.pasada { border-left-color: var(--borde-campo); }
+.act-ag.pasada h3, .act-ag.pasada .meta { opacity: 0.72; }
+.act-hora { display: flex; flex-direction: column; align-items: center; padding-top: 0.15rem; font-variant-numeric: tabular-nums; }
+.act-hora strong { font-size: 1rem; line-height: 1.2; color: var(--azul-profundo); }
+.act-hora span { font-size: 0.76rem; color: var(--texto-suave); }
+.act-cuerpo { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.act-cuerpo h3 { margin: 0.15rem 0 0; font-size: 0.98rem; }
+.act-cuerpo .meta { font-size: 0.78rem; color: var(--texto-suave); }
+.estado.pronto { background: var(--info-fondo); color: var(--info-texto); }
+.estado.pasada { background: var(--fondo-alt); color: var(--texto-suave); }
+.chip.ok { background: var(--azul-profundo); color: var(--blanco); }
+.chip[hidden], .estado[hidden], .choque[hidden], .alerta-sel[hidden] { display: none; }
+
+/* Aviso de empalme de horario */
+.choque {
+  display: flex; gap: 0.5rem; align-items: flex-start; margin: 0.3rem 0 0; padding: 0.55rem 0.7rem;
+  font-size: 0.8rem; font-weight: 600; color: var(--azul-profundo);
+  background: var(--aviso-fondo); border-left: 4px solid var(--amarillo); border-radius: 8px;
+}
+.choque .ico { width: 18px; height: 18px; margin-top: 0.1rem; color: var(--ambar); }
+
+/* Botón y alerta de cada actividad */
+.act-acciones { display: flex; flex-wrap: wrap; gap: 0.5rem 0.7rem; align-items: center; margin-top: 0.4rem; }
+.btn-agenda {
+  display: inline-block; padding: 0.55rem 0.95rem; font: inherit; font-size: 0.82rem; font-weight: 700; text-align: center; text-decoration: none;
+  cursor: pointer; color: var(--blanco); background: var(--azul-profundo); border: 2px solid var(--azul-profundo); border-radius: 10px;
+}
+.btn-agenda:hover { background: var(--azul-corp); border-color: var(--azul-corp); }
+.btn-agenda.quitar { color: var(--azul-profundo); background: var(--blanco); }
+.btn-agenda.quitar:hover { color: var(--blanco); }
+.btn-agenda:disabled { opacity: 0.6; cursor: progress; }
+.alerta-sel { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 600; color: var(--azul-profundo); }
+.alerta-sel .ico { width: 16px; height: 16px; color: var(--azul-corp); }
+.alerta-sel select {
+  padding: 0.4rem 0.5rem; font: inherit; font-size: 0.8rem; color: var(--texto);
+  background: var(--blanco); border: 1.5px solid var(--borde-campo); border-radius: 8px;
+}
+.alerta-sel select:focus { outline: 3px solid var(--azul-corp); outline-offset: 1px; }
+
+/* Alertas dentro de la app (toast) */
+.alertas-app {
+  position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 60;
+  width: min(430px, 100%); padding: 0 0.75rem; display: grid; gap: 0.5rem; pointer-events: none;
+}
+.alerta-toast {
+  pointer-events: auto; padding: 0.8rem 0.9rem; color: var(--blanco); background: var(--azul-profundo);
+  border-left: 5px solid var(--amarillo); border-radius: 14px; box-shadow: 0 14px 40px rgba(20, 15, 83, 0.35);
+  animation: entra-toast 0.25s ease-out;
+}
+.alerta-toast .etq { display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amarillo); }
+.alerta-toast .etq .ico { width: 16px; height: 16px; }
+.alerta-toast strong { display: block; margin-top: 0.25rem; font-size: 0.95rem; line-height: 1.3; }
+.alerta-toast p { margin: 0.15rem 0 0; font-size: 0.82rem; color: #e4e7f6; }
+.alerta-toast .botones { display: flex; gap: 0.5rem; margin-top: 0.65rem; }
+.alerta-toast .botones a, .alerta-toast .botones button {
+  padding: 0.45rem 0.85rem; font: inherit; font-size: 0.8rem; font-weight: 700; text-decoration: none; cursor: pointer; border-radius: 9px;
+}
+.alerta-toast .botones a { color: var(--azul-profundo); background: var(--amarillo); border: 2px solid var(--amarillo); }
+.alerta-toast .botones button { color: var(--blanco); background: transparent; border: 2px solid var(--blanco); }
+@keyframes entra-toast { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+/* Insignia de alertas en la pestaña Agenda */
+.tabbar a { position: relative; }
+.tab-badge {
+  position: absolute; top: 3px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px;
+  display: grid; place-items: center; font-size: 0.68rem; font-weight: 700; line-height: 1;
+  color: var(--azul-profundo); background: var(--amarillo); border-radius: 999px;
+}
+.tab-badge[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .alerta-toast { animation: none; }
+}

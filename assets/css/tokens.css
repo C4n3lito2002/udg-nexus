@@ -48,6 +48,7 @@
   --error: #b42318;
   --error-fondo: #fff5f5;
   --error-texto: #7a1a12;
+  --aviso-fondo: #fff4d1;   /* aviso suave derivado del amarillo oficial */
 
   /* --- Tipografía --- */
   --fuente: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;

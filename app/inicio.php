@@ -26,7 +26,7 @@ require __DIR__ . '/../includes/app_header.php';
   <h1>Bienvenido a UDG NEXUS</h1>
   <p>Feria de transferencia tecnológica · Plaza Bicentenario, CCU</p>
   <?php if (reloj_simulado_activo()): ?>
-    <span class="reloj-demo"><?= icono('reloj') ?>Hora de la demo: <?= h(fecha_larga($ahora)) ?>, <?= h(hora_corta($ahora)) ?><?= $diaEvento ? ' · Día ' . $diaEvento : '' ?></span>
+    <span class="reloj-demo"><?= icono('reloj') ?>Hora de la demo: <span data-fecha-evento><?= h(fecha_larga($ahora)) ?></span>, <span data-hora-evento><?= h(hora_corta($ahora)) ?></span><span data-dia-evento><?= $diaEvento ? ' · Día ' . $diaEvento : '' ?></span></span>
   <?php elseif ($diaEvento): ?>
     <span class="reloj-demo"><?= icono('reloj') ?>Día <?= $diaEvento ?> del evento</span>
   <?php endif; ?>
@@ -46,7 +46,7 @@ require __DIR__ . '/../includes/app_header.php';
   <a class="atajo" href="proximamente.php?m=gafete"><span class="circulo"><?= icono('gafete') ?></span>Gafete QR</a>
   <a class="atajo" href="proximamente.php?m=mapa"><span class="circulo"><?= icono('mapa') ?></span>Mapa</a>
   <a class="atajo" href="catalogo.php"><span class="circulo"><?= icono('catalogo') ?></span>Catálogo</a>
-  <a class="atajo" href="proximamente.php?m=agenda"><span class="circulo"><?= icono('agenda') ?></span>Mi agenda</a>
+  <a class="atajo" href="agenda.php?ver=mia"><span class="circulo"><?= icono('agenda') ?></span>Mi agenda</a>
 </nav>
 
 <section class="seccion" aria-labelledby="h-ahora">
