@@ -273,3 +273,6 @@ footer a:hover { text-decoration: underline; }
   html { scroll-behavior: auto; }
   .btn { transition: none; }
 }
+
+/* Fase 3: el registro con boleto vive en la app; esta sección solo lleva hacia allá */
+.cta-registro { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }

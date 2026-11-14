@@ -11,9 +11,8 @@ udg-nexus/
 ├── index.php              Inicio — La idea, oportunidad y viabilidad
 ├── experiencia.php         Zonificación, comité organizador y cronograma
 ├── patrocinadores.php      Patrocinadores y aliados por categoría
-├── registro.php            Acreditación + solicitud de cita B2B (formularios)
+├── registro.php            Enlace al registro con boleto (app) + solicitud de cita B2B
 ├── contacto.php             Contacto / interés en patrocinio (formulario)
-├── procesar_acreditacion.php  Backend: guarda el registro de acreditación
 ├── procesar_cita.php          Backend: guarda la solicitud de cita B2B
 ├── procesar_contacto.php      Backend: guarda el mensaje de contacto
 ├── config.php              Conexión a MySQL (edítalo si tu MAMP es distinto)
@@ -83,7 +82,7 @@ ajusta la URL — también visible en MAMP → Preferencias → Ports.)
 
 ## Qué sí funciona de verdad (y qué no)
 
-- Los **tres formularios** (acreditación, cita B2B y contacto) sí
+- Los formularios del sitio (cita B2B y contacto) sí
   validan los campos obligatorios y sí insertan los registros en
   MySQL — puedes revisarlos después en phpMyAdmin, pestaña **Examinar**
   de cada tabla.
@@ -101,8 +100,9 @@ ajusta la URL — también visible en MAMP → Preferencias → Ports.)
 En phpMyAdmin → base `udg_nexus` → clic en cada tabla → pestaña
 **Examinar**:
 
-- `acreditaciones` — todos los registros del formulario de la sección
-  "Acreditación".
+- `acreditaciones` — histórico del antiguo formulario de acreditación (ya
+  no se llena: el registro con boleto y gafete QR vive en la app, ver
+  `docs/FASE3.md`).
 - `citas_b2b` — todas las solicitudes de cita 1:1.
 - `contactos_patrocinio` — todos los mensajes del formulario de
   Contacto.

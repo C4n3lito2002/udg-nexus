@@ -3,7 +3,6 @@ require_once __DIR__ . '/../includes/app.php';
 
 $modulos = [
     'mapa'   => ['Mapa del recinto', 'Plano de la Plaza Bicentenario y el CCU con la ubicación de stands, zonas y la Demo Arena.'],
-    'gafete' => ['Gafete digital', 'Tu gafete con código QR para ingresar al evento y registrar tu asistencia.'],
 ];
 $m = $_GET['m'] ?? '';
 if (!isset($modulos[$m])) {

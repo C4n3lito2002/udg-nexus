@@ -1,0 +1,12 @@
+Librerías de terceros incluidas en esta carpeta (se sirven desde aquí para que la app
+funcione sin internet; no se carga nada desde un CDN):
+
+- qrcode.js  — "QR Code Generator for JavaScript" 1.4.4, Kazuhiko Arase. Licencia MIT.
+               https://github.com/kazuhikoarase/qrcode-generator
+               Dibuja el QR del gafete en el navegador.
+- jsQR.js    — jsQR 1.4.0, Cosmo Wolfe. Licencia Apache 2.0 (ver jsQR.LICENSE.txt).
+               https://github.com/cozmo/jsQR
+               Lee el QR con la cámara en el escáner del staff cuando el navegador no trae
+               BarcodeDetector (por ejemplo Safari). Solo se descarga en esa pantalla.
+
+"QR Code" es marca registrada de DENSO WAVE INCORPORATED.

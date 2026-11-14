@@ -25,11 +25,16 @@ require __DIR__ . '/../../includes/app_header.php';
     <h3>Avisos</h3>
     <p>Publicar avisos para todos o para un rol.</p>
   </div>
-  <div class="tarjeta inactiva" aria-disabled="true">
-    <div class="chips"><span class="chip">Próximamente</span></div>
+  <a class="tarjeta" href="escaner.php">
+    <div class="chips"><span class="chip oscuro">Staff</span></div>
     <h3>Escáner de acceso</h3>
-    <p>Validar boletos con código QR en la entrada.</p>
-  </div>
+    <p>Validar boletos con código QR en la entrada: cada uno entra una sola vez.</p>
+  </a>
+  <a class="tarjeta" href="boletos.php">
+    <div class="chips"><span class="chip oscuro">Boletos</span></div>
+    <h3>Boletos y accesos</h3>
+    <p>Boletos emitidos, usados y últimas lecturas del escáner. Reinicia la demo.</p>
+  </a>
 </div>
 
 <?php require __DIR__ . '/../../includes/app_footer.php'; ?>

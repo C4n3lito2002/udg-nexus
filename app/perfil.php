@@ -35,6 +35,32 @@ require __DIR__ . '/../includes/app_header.php';
   </dl>
 </section>
 
+<?php if (boletos_tablas_existen()): $bol = boleto_de_usuario((int) $u['id']); ?>
+<section class="bloque">
+  <h2>Mi boleto</h2>
+  <?php if ($bol): ?>
+    <dl class="datos">
+      <div><dt>Boleto</dt><dd><?= h($bol['tipo']) ?></dd></div>
+      <div><dt>Folio</dt><dd><?= h(boleto_folio((int) $bol['id'])) ?></dd></div>
+      <div><dt>Estado</dt><dd><?= chip_estatus_boleto($bol['estatus']) ?></dd></div>
+    </dl>
+    <a class="btn-app ancho" href="gafete.php" style="margin-top:0.8rem">Ver mi gafete</a>
+  <?php elseif (tiene_rol('staff', 'admin')): ?>
+    <p class="suave">El staff no necesita boleto.</p>
+  <?php else: ?>
+    <p class="suave">Aún no tienes boleto.</p>
+    <a class="btn-app ancho" href="boletos.php">Elegir mi boleto</a>
+  <?php endif; ?>
+</section>
+<?php endif; ?>
+
+<?php if (tiene_rol('staff', 'admin')): ?>
+<section class="bloque">
+  <h2>Control de acceso</h2>
+  <a class="btn-app ancho" href="admin/escaner.php">Abrir el escáner de acceso</a>
+</section>
+<?php endif; ?>
+
 <?php if (tiene_rol('admin')): ?>
 <section class="bloque">
   <h2>Administración</h2>

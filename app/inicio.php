@@ -43,7 +43,7 @@ require __DIR__ . '/../includes/app_header.php';
 </div>
 
 <nav class="atajos" aria-label="Accesos directos">
-  <a class="atajo" href="proximamente.php?m=gafete"><span class="circulo"><?= icono('gafete') ?></span>Gafete QR</a>
+  <a class="atajo" href="gafete.php"><span class="circulo"><?= icono('gafete') ?></span>Gafete QR</a>
   <a class="atajo" href="proximamente.php?m=mapa"><span class="circulo"><?= icono('mapa') ?></span>Mapa</a>
   <a class="atajo" href="catalogo.php"><span class="circulo"><?= icono('catalogo') ?></span>Catálogo</a>
   <a class="atajo" href="agenda.php?ver=mia"><span class="circulo"><?= icono('agenda') ?></span>Mi agenda</a>

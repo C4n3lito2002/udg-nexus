@@ -2,14 +2,18 @@
 require_once __DIR__ . '/../includes/app.php';
 
 if (usuario_actual()) {
-    header('Location: perfil.php');
+    header('Location: ' . (boletos_tablas_existen() ? 'gafete.php' : 'perfil.php'));
     exit;
 }
 
 $areas = areas_todas();
+$tipos = boletos_tablas_existen() ? tipos_boleto_todos() : [];
 $slugsValidos = array_column($areas, 'slug');
 $errores = [];
-$v = ['nombre' => '', 'correo' => '', 'rol' => 'estudiante', 'institucion' => '', 'intereses' => []];
+$v = ['nombre' => '', 'correo' => '', 'rol' => 'estudiante', 'institucion' => '', 'intereses' => [], 'tipo' => 0];
+if ($tipos) {   // boleto preseleccionado para el rol por omisión
+    $v['tipo'] = (tipo_boleto_sugerido($tipos, $v['rol']) ?? $tipos[0])['id'];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validar();
@@ -18,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $v['rol']         = (string) ($_POST['rol'] ?? '');
     $v['institucion'] = trim((string) ($_POST['institucion'] ?? ''));
     $v['intereses']   = array_values(array_intersect($slugsValidos, (array) ($_POST['intereses'] ?? [])));
+    $v['tipo']        = (int) ($_POST['tipo'] ?? 0);
     $clave  = (string) ($_POST['clave'] ?? '');
     $clave2 = (string) ($_POST['clave2'] ?? '');
 
@@ -42,6 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores['correo'] = 'Ese correo ya tiene una cuenta. Inicia sesión.';
     }
 
+    $tipoElegido = null;
+    if ($tipos) {
+        foreach ($tipos as $t) {
+            if ($t['id'] === $v['tipo']) {
+                $tipoElegido = $t;
+            }
+        }
+        if ($tipoElegido === null) {
+            $errores['tipo'] = 'Elige tu tipo de boleto.';
+        } elseif ($tipoElegido['disponibles'] < 1) {
+            $errores['tipo'] = 'Ese boleto se agotó. Elige otro.';
+        }
+    }
+
     if (!$errores) {
         $ok = ejecutar(
             'INSERT INTO usuarios (nombre, correo, password_hash, rol, institucion, intereses) VALUES (?, ?, ?, ?, ?, ?)',
@@ -49,7 +68,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [$v['nombre'], $v['correo'], password_hash($clave, PASSWORD_DEFAULT), $v['rol'], $v['institucion'], implode(',', $v['intereses'])]
         );
         if ($ok) {
-            iniciar_sesion_usuario((int) db()->insert_id);
+            $nuevoId = (int) db()->insert_id;
+            iniciar_sesion_usuario($nuevoId);
+            if ($tipoElegido !== null) {
+                if ((float) $tipoElegido['precio'] > 0) {          // boleto con costo: pasa a la compra simulada
+                    header('Location: boletos.php?comprar=' . (int) $tipoElegido['id']);
+                    exit;
+                }
+                boleto_emitir($nuevoId, (int) $tipoElegido['id']);  // gratis: se emite al momento
+                header('Location: gafete.php?nuevo=1');
+                exit;
+            }
             header('Location: inicio.php');
             exit;
         }
@@ -70,11 +99,12 @@ function desc(array $errores, string $campo): string
 $titulo = 'Crear cuenta';
 $activa = '';
 $volver = 'login.php';
+$scripts = ['assets/js/boletos.js'];
 require __DIR__ . '/../includes/app_header.php';
 ?>
 
-<h1>Crear cuenta</h1>
-<p class="suave">Con tu cuenta guardas tu agenda y recibes recomendaciones según tus intereses.</p>
+<h1>Crear cuenta y registrarte</h1>
+<p class="suave">Con tu cuenta guardas tu agenda y recibes recomendaciones según tus intereses<?= $tipos ? '. Al terminar recibes tu boleto con gafete QR.' : '.' ?></p>
 
 <?php if (isset($errores['general'])): ?>
   <div class="alerta error" role="alert"><?= h($errores['general']) ?></div>
@@ -107,6 +137,22 @@ require __DIR__ . '/../includes/app_header.php';
     <?= error_campo($errores, 'rol') ?>
   </div>
 
+  <?php if ($tipos): ?>
+  <fieldset class="campo" data-tipos>
+    <legend>Tu boleto</legend>
+    <?php foreach ($tipos as $t): $agotado = $t['disponibles'] < 1; ?>
+      <label class="opcion">
+        <input type="radio" name="tipo" value="<?= (int) $t['id'] ?>" data-roles="<?= h($t['rol_sugerido']) ?>"
+               <?= $v['tipo'] === $t['id'] ? 'checked' : '' ?> <?= $agotado ? 'disabled' : '' ?>>
+        <span><strong><?= h($t['nombre']) ?> · <?= h(precio_texto($t['precio'])) ?></strong>
+          <?= h($t['descripcion']) ?><?= $agotado ? ' (Agotado)' : '' ?></span>
+      </label>
+    <?php endforeach; ?>
+    <?= error_campo($errores, 'tipo') ?>
+    <p class="pequeno suave">Los boletos con costo usan un pago simulado: no se cobra nada.</p>
+  </fieldset>
+  <?php endif; ?>
+
   <div class="campo">
     <label for="institucion">Institución o empresa <span class="suave">(opcional)</span></label>
     <input type="text" id="institucion" name="institucion" value="<?= h($v['institucion']) ?>" autocomplete="organization"<?= desc($errores, 'institucion') ?>>
@@ -135,7 +181,7 @@ require __DIR__ . '/../includes/app_header.php';
     <?= error_campo($errores, 'clave2') ?>
   </div>
 
-  <button class="btn-app ancho" type="submit">Crear cuenta</button>
+  <button class="btn-app ancho" type="submit"><?= $tipos ? 'Crear cuenta y continuar' : 'Crear cuenta' ?></button>
 </form>
 
 <p class="centrado">¿Ya tienes cuenta? <a href="login.php">Iniciar sesión</a></p>

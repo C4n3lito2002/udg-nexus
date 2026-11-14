@@ -7,7 +7,7 @@ $tabs = [
     'catalogo' => ['Catálogo', 'catalogo.php'],
     'agenda'   => ['Agenda',   'agenda.php'],
     'mapa'     => ['Mapa',     'proximamente.php?m=mapa'],
-    'gafete'   => ['Gafete',   'proximamente.php?m=gafete'],
+    'gafete'   => ['Gafete',   'gafete.php'],
 ];
 ?>
 </main>
@@ -23,5 +23,7 @@ $tabs = [
 
 </div>
 <script src="<?= h(prefijo_raiz()) ?>assets/js/app.js"></script>
+<?php foreach (($scripts ?? []) as $_js): ?><script src="<?= h(prefijo_raiz() . $_js) ?>"></script>
+<?php endforeach; ?>
 </body>
 </html>

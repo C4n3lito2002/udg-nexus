@@ -1,15 +1,12 @@
 <?php
-$pageTitle = 'Registro, acreditación y citas B2B — UDG NEXUS';
+$pageTitle = 'Registro, boleto y citas B2B — UDG NEXUS';
 $activePage = 'registro.php';
 require_once 'config.php';
 require_once 'includes/forms.php';   // sesión + token de un solo uso (antes de imprimir HTML)
 require_once 'includes/header.php';
 
-$okAcred = isset($_GET['acred']) && $_GET['acred'] === 'ok';
-$errAcred = isset($_GET['acred']) && $_GET['acred'] === 'error';
 $okCita = isset($_GET['cita']) && $_GET['cita'] === 'ok';
 $errCita = isset($_GET['cita']) && $_GET['cita'] === 'error';
-$expAcred = isset($_GET['acred']) && $_GET['acred'] === 'expirado';
 $expCita = isset($_GET['cita']) && $_GET['cita'] === 'expirado';
 ?>
 
@@ -17,7 +14,7 @@ $expCita = isset($_GET['cita']) && $_GET['cita'] === 'expirado';
   <div class="wrap">
     <span class="hero-kicker">Participación</span>
     <h1 style="font-size: clamp(1.9rem, 4vw, 2.6rem);">Regístrate y agenda tu cita B2B</h1>
-    <p class="lede">Elige tu tipo de gafete y, si vienes a negociar, reserva un espacio en el Patent Room o en el Due Diligence Desk.</p>
+    <p class="lede">Regístrate en la app para recibir tu boleto con gafete QR y, si vienes a negociar, reserva un espacio en el Patent Room o en el Due Diligence Desk.</p>
   </div>
 </header>
 
@@ -25,60 +22,14 @@ $expCita = isset($_GET['cita']) && $_GET['cita'] === 'expirado';
   <div class="wrap">
     <div class="section-head">
       <span class="idx">6.6</span>
-      <h2>Acreditación</h2>
+      <h2>Registro y boleto con gafete QR</h2>
     </div>
-
-    <?php if ($okAcred): ?>
-      <div class="alert">Tu registro se guardó correctamente. Te contactaremos con los detalles de tu gafete antes del evento.</div>
-    <?php elseif ($errAcred): ?>
-      <div class="alert error">No pudimos guardar tu registro. Revisa que todos los campos obligatorios estén completos e inténtalo de nuevo.</div>
-    <?php elseif ($expAcred): ?>
-      <div class="alert error">El formulario expiró o ya se había enviado. Recarga la página e inténtalo de nuevo.</div>
-    <?php endif; ?>
-
-    <form action="procesar_acreditacion.php" method="post" data-validate novalidate>
-      <?= form_campo('acreditacion') ?>
-      <div class="form-grid">
-        <div class="field">
-          <label for="nombre_completo">Nombre completo *</label>
-          <input type="text" id="nombre_completo" name="nombre_completo" required>
-        </div>
-        <div class="field">
-          <label for="correo">Correo electrónico *</label>
-          <input type="email" id="correo" name="correo" required>
-        </div>
-        <div class="field">
-          <label for="telefono">Teléfono</label>
-          <input type="tel" id="telefono" name="telefono">
-        </div>
-        <div class="field">
-          <label for="institucion_empresa">Institución / Empresa</label>
-          <input type="text" id="institucion_empresa" name="institucion_empresa">
-        </div>
-        <div class="field">
-          <label for="tipo_gafete">Tipo de gafete *</label>
-          <select id="tipo_gafete" name="tipo_gafete" required>
-            <option value="">Selecciona una opción</option>
-            <option value="Inversionista/Comprador">Inversionista / Comprador</option>
-            <option value="Expositor/Investigador">Expositor / Investigador</option>
-            <option value="Prensa">Prensa</option>
-            <option value="VIP">VIP</option>
-            <option value="Staff">Staff</option>
-            <option value="Estudiante/Público general">Estudiante / Público general</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="eje_tematico">Eje temático de interés</label>
-          <input type="text" id="eje_tematico" name="eje_tematico" placeholder="Salud, Agro, Manufactura, Energía...">
-        </div>
-        <div class="field full">
-          <label for="comentarios">Comentarios</label>
-          <textarea id="comentarios" name="comentarios"></textarea>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-brass mt-lg">Completar registro</button>
-      <p class="form-note">Tus datos se usan únicamente para la acreditación y comunicación del evento.</p>
-    </form>
+    <p class="section-intro">El registro se hace en la app de UDG NEXUS: creas tu cuenta, eliges tu boleto (hay opciones sin costo y otras con pago simulado) y recibes tu gafete con código QR para entrar al evento y armar tu agenda.</p>
+    <div class="cta-registro">
+      <a class="btn btn-brass" href="app/registro_app.php">Crear cuenta y obtener mi boleto</a>
+      <a class="btn btn-ink" href="app/boletos.php">Ver los tipos de boleto</a>
+    </div>
+    <p class="form-note">¿Ya tienes cuenta? <a href="app/login.php">Inicia sesión</a> para ver tu gafete.</p>
   </div>
 </section>
 
