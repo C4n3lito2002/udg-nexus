@@ -1,0 +1,39 @@
+<?php
+/**
+ * Cabecera de la app móvil.
+ * Variables (opcionales) antes del include:
+ *   $titulo   -> título de la pestaña
+ *   $activa   -> inicio | catalogo | agenda | mapa | gafete
+ *   $volver   -> URL del botón "volver" (si se omite, muestra el logo)
+ */
+$titulo = $titulo ?? 'UDG NEXUS App';
+$activa = $activa ?? '';
+$volver = $volver ?? null;
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title><?= h($titulo) ?> — UDG NEXUS</title>
+<meta name="theme-color" content="#140f53">
+<link rel="preload" href="../assets/fonts/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="app">
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<div class="app-shell">
+
+<header class="app-bar">
+  <?php if ($volver): ?>
+    <a class="app-back" href="<?= h($volver) ?>" aria-label="Volver"><?= icono('volver') ?></a>
+  <?php endif; ?>
+  <a class="app-logo" href="inicio.php" aria-label="UDG NEXUS — Inicio">
+    <img src="../assets/img/logo-udg-nexus.png" width="505" height="283" alt="UDG NEXUS">
+  </a>
+  <a class="app-sitio" href="../index.php"><?= icono('sitio') ?><span>Sitio</span></a>
+</header>
+
+<main id="contenido" class="app-main">

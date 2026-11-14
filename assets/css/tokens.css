@@ -1,0 +1,59 @@
+/* ============================================================
+   UDG NEXUS — Tokens de diseño
+   Fuente única de verdad: Manual de Identidad UDG NEXUS.
+   Paleta oficial y tipografía Poppins (700 / 600 / 400).
+   ============================================================ */
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/poppins-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/poppins-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/poppins-latin-700-normal.woff2") format("woff2");
+}
+
+:root {
+  /* --- Paleta oficial del manual (no modificar) --- */
+  --azul-profundo: #140f53;
+  --azul-corp: #225bab;
+  --cian-nodo: #4ca2b5;
+  --ambar: #ab8108;
+  --amarillo: #ffbd00;
+
+  /* --- Neutros derivados del azul profundo (no definidos en el manual) --- */
+  --blanco: #ffffff;
+  --fondo-alt: #f4f6fb;
+  --texto: #140f53;
+  --texto-suave: #4a4f78;
+  --borde: #dfe3f0;
+  --borde-campo: #7b84ad;
+
+  /* --- Estados (no definidos en el manual) --- */
+  --info-fondo: #e9f4f7;
+  --info-texto: #1b5565;
+  --error: #b42318;
+  --error-fondo: #fff5f5;
+  --error-texto: #7a1a12;
+
+  /* --- Tipografía --- */
+  --fuente: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* --- Medidas --- */
+  --ancho-max: 1120px;
+  --radio: 14px;
+  --radio-campo: 10px;
+}

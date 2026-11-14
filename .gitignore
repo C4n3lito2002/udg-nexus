@@ -1,0 +1,11 @@
+# Credenciales y configuración local
+config.local.php
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+
+# Dependencias
+node_modules/
