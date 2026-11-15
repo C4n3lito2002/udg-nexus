@@ -235,6 +235,7 @@ function icono(string $nombre): string
         'alerta'   => '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
         'ok'       => '<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16 9.5"/>',
         'aviso'    => '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',
+        'estrella' => '<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
     ];
     $d = $trazos[$nombre] ?? '';
     return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $d . '</svg>';
@@ -443,10 +444,13 @@ function dia_del_evento(DateTimeInterface $fecha): ?int
     return ($dias >= 0 && $dias < $total) ? $dias + 1 : null;
 }
 
-/** Tarjeta de un proyecto (catálogo, búsqueda y relacionados). */
-function tarjeta_proyecto(array $p): string
+/** Tarjeta de un proyecto (catálogo, búsqueda, relacionados y recomendaciones; $motivo es opcional). */
+function tarjeta_proyecto(array $p, ?string $motivo = null): string
 {
     $html  = '<a class="tarjeta" href="proyecto.php?id=' . (int) $p['id'] . '">';
+    if ($motivo !== null && $motivo !== '') {
+        $html .= reco_motivo_html($motivo);
+    }
     $html .= '<div class="chips"><span class="chip">' . h($p['area']) . '</span>';
     if (!empty($p['busca_inversion'])) {
         $html .= '<span class="chip inv">Busca inversión</span>';
@@ -588,6 +592,60 @@ function agenda_total_empalmes(array $agenda): int
     return $n;
 }
 
+/** Texto corto de estado respecto al reloj (los mismos textos que app.js al avanzar la hora). */
+function estado_agenda(array $a, DateTimeImmutable $ahora): array
+{
+    [$clase, $etiqueta] = estado_actividad(new DateTimeImmutable($a['inicio']), new DateTimeImmutable($a['fin']), $ahora);
+    return [$clase, $clase === 'luego' ? '' : $etiqueta];
+}
+
+/** Tarjeta de una actividad con su botón de agenda. $motivo (opcional): línea "Porque te interesa…" de las recomendaciones. */
+function tarjeta_agenda(array $a, ?array $g, DateTimeImmutable $ahora, ?array $usuario, bool $tablaOk, array $miAgenda, ?string $motivo = null): string
+{
+    $ini = new DateTimeImmutable($a['inicio']);
+    $fin = new DateTimeImmutable($a['fin']);
+    [$clase, $etiqueta] = estado_agenda($a, $ahora);
+    $enAgenda = $g !== null;
+    $textoChoque = $usuario ? agenda_texto_choque(agenda_choca_con($a, $miAgenda), $enAgenda) : '';
+    $alerta = $enAgenda && $g['alerta_minutos'] !== null ? (int) $g['alerta_minutos'] : null;
+
+    $h  = '<article class="act-ag ' . h($clase) . '" data-actividad="' . (int) $a['id'] . '"'
+        . ' data-inicio="' . h($a['inicio']) . '" data-fin="' . h($a['fin']) . '" data-titulo="' . h($a['titulo']) . '">';
+    $h .= '<div class="act-hora"><strong>' . h(hora_corta($ini)) . '</strong><span>' . h(hora_corta($fin)) . '</span></div>';
+    $h .= '<div class="act-cuerpo">';
+    $h .= '<div class="chips"><span class="estado ' . h($clase) . '" data-estado' . ($etiqueta === '' ? ' hidden' : '') . '>' . h($etiqueta) . '</span>'
+        . '<span class="chip ok" data-chip-agenda' . ($enAgenda ? '' : ' hidden') . '>En tu agenda</span></div>';
+    if ($motivo !== null && $motivo !== '') {
+        $h .= reco_motivo_html($motivo);
+    }
+    $h .= '<h3>' . h($a['titulo']) . '</h3>';
+    $zonaTxt = !empty($a['zona_id'])
+        ? '<a class="enlace-mapa" href="mapa.php?zona=' . (int) $a['zona_id'] . '">' . h($a['zona']) . '</a>'
+        : h($a['zona']);
+    $h .= '<span class="meta">' . h($a['tipo']) . ' · ' . $zonaTxt . '</span>';
+    if (!empty($a['ponente'])) {
+        $h .= '<span class="meta">' . h($a['ponente']) . '</span>';
+    }
+    if ($usuario) {
+        $h .= '<p class="choque" data-choque' . ($textoChoque === '' ? ' hidden' : '') . '>' . icono('aviso') . '<span>' . h($textoChoque) . '</span></p>';
+    }
+
+    if ($usuario && $tablaOk) {
+        $h .= '<div class="act-acciones">';
+        $h .= '<button type="button" class="btn-agenda' . ($enAgenda ? ' quitar' : '') . '" data-agenda-btn>'
+            . ($enAgenda ? 'Quitar de mi agenda' : 'Agregar a mi agenda') . '</button>';
+        $h .= '<label class="alerta-sel" data-alerta-wrap' . ($enAgenda ? '' : ' hidden') . '>' . icono('alerta') . '<span>Avisarme</span>'
+            . '<select data-alerta-sel aria-label="Alerta para ' . h($a['titulo']) . '">';
+        foreach ([['', 'Sin alerta'], [15, '15 min antes'], [30, '30 min antes'], [60, '60 min antes']] as [$v, $t]) {
+            $h .= '<option value="' . h($v) . '"' . ((string) $v === (string) ($alerta ?? '') ? ' selected' : '') . '>' . h($t) . '</option>';
+        }
+        $h .= '</select></label></div>';
+    } elseif (!$usuario) {
+        $h .= '<div class="act-acciones"><a class="btn-agenda" href="login.php?volver=' . rawurlencode($_SERVER['REQUEST_URI'] ?? '') . '">Entra para agregar a tu agenda</a></div>';
+    }
+    return $h . '</div></article>';
+}
+
 /** Datos mínimos de la agenda para la página y la API (JSON). */
 function agenda_para_js(array $agenda): array
 {
@@ -645,3 +703,4 @@ require_once __DIR__ . '/auth.php';
 sesion_iniciar();
 require_once __DIR__ . '/boletos.php';
 require_once __DIR__ . '/avisos.php';
+require_once __DIR__ . '/recomendaciones.php';

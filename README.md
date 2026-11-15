@@ -98,6 +98,9 @@ ajusta la URL — también visible en MAMP → Preferencias → Ports.)
   barra) y un panel del administrador (`app/admin/avisos.php`) para publicar avisos a todos o a
   un rol. Los avisos nuevos llegan al celular sin recargar (sondeo de `api/ahora.php`);
   instrucciones de importación en `docs/FASE5.md`.
+- **Para ti** (`app/recomendaciones.php` y un bloque en el Home): recomendaciones de actividades y proyectos
+  según el rol y los intereses de cada persona, con reglas simples (sin IA) y el motivo de cada una.
+  Importar `db/migraciones/008_recomendaciones.sql` y `db/seed/007_seed_recomendaciones.sql`; detalle en `docs/FASE5B.md`.
 - No se incluyen imágenes/fotos reales de personas, marcas o del CCU
   (por restricciones de derechos de imagen); el diseño usa solo
   tipografía, color y elementos gráficos propios.

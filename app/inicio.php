@@ -19,6 +19,14 @@ $anuncios = consulta(
 );
 $diaEvento = dia_del_evento($ahora);
 
+// Para ti (Fase 5B): solo con sesión, rol que recibe recomendaciones y migración 008 importada.
+$usuarioHome = usuario_actual();
+$recoHome = [];
+if (reco_aplica($usuarioHome) && reco_tablas_existen()) {
+    $recoHome = reco_filtrar(reco_para($usuarioHome, $ahora)['items'], null, 4);
+    [$miAgendaHome, $porIdHome] = reco_agenda_de((int) $usuarioHome['id']);
+}
+
 require __DIR__ . '/../includes/app_header.php';
 ?>
 
@@ -75,6 +83,31 @@ require __DIR__ . '/../includes/app_header.php';
     <p class="vacio-lista">No hay actividades programadas por ahora.</p>
   <?php endif; ?>
 </section>
+
+<?php if ($recoHome): ?>
+<section class="seccion" aria-labelledby="h-parati">
+  <div class="seccion-cabecera">
+    <h2 id="h-parati"><?= icono('estrella') ?>Para ti</h2>
+    <a href="recomendaciones.php">Ver todas</a>
+  </div>
+  <p class="suave pequeno" style="margin-top:-0.3rem">Según tu rol e intereses. Reglas simples, sin inteligencia artificial.</p>
+  <div data-agenda>
+    <div class="agenda-lista">
+      <?php foreach ($recoHome as $it) { echo reco_html_item($it, $ahora, $usuarioHome, agenda_tabla_existe(), $miAgendaHome, $porIdHome); } ?>
+    </div>
+    <?= reco_json_agenda($miAgendaHome) ?>
+  </div>
+</section>
+<?php elseif (!$usuarioHome): ?>
+<section class="seccion" aria-labelledby="h-parati">
+  <div class="seccion-cabecera"><h2 id="h-parati"><?= icono('estrella') ?>Para ti</h2></div>
+  <div class="reco-invita">
+    <strong>Recomendaciones según tu perfil</strong>
+    <p>Inicia sesión para ver actividades y proyectos pensados para tu rol y tus intereses.</p>
+    <a href="login.php?volver=<?= h(rawurlencode($_SERVER['REQUEST_URI'] ?? '')) ?>">Iniciar sesión</a>
+  </div>
+</section>
+<?php endif; ?>
 
 <section class="seccion" aria-labelledby="h-vitrina">
   <div class="seccion-cabecera">

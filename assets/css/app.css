@@ -737,3 +737,29 @@ span.btn-app[aria-disabled="true"]:hover { background: var(--blanco); color: var
 .confirmar-retiro h2 { margin: 0 0 0.4rem; font-size: 1rem; }
 .confirmar-retiro .acciones { display: grid; gap: 0.5rem; margin-top: 0.8rem; }
 @media (prefers-reduced-motion: reduce) { .aviso.entra { animation: none; } }
+
+/* ============================================================
+   Fase 5B — recomendaciones por perfil ("Para ti")
+   Colores solo de la paleta del manual y de los neutros de tokens.css.
+   ============================================================ */
+.reco-motivo {
+  display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.35rem;
+  font-size: 0.76rem; font-weight: 600; line-height: 1.35; color: var(--azul-corp);
+}
+.reco-motivo .ico { width: 15px; height: 15px; color: var(--ambar); }
+.reco-perfil { margin: 0.2rem 0 0.4rem; padding: 0.8rem 0.9rem; background: var(--fondo-alt); border-radius: var(--radio); }
+.reco-perfil .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.reco-perfil p { margin: 0.4rem 0 0; }
+.reco-perfil-tit { margin: 0 0 0.4rem !important; font-size: 0.78rem; font-weight: 700; color: var(--azul-profundo); }
+.reco-reglas { margin-top: 1.5rem; padding: 0.8rem 0.9rem; border: 1px solid var(--borde); border-radius: var(--radio); font-size: 0.85rem; }
+.reco-reglas summary { cursor: pointer; font-weight: 700; color: var(--azul-profundo); }
+.reco-reglas ul { margin: 0 0 0.7rem; padding-left: 1.2rem; }
+.reco-reglas li { margin-bottom: 0.25rem; }
+.reco-reglas p { margin: 0.6rem 0 0; color: var(--texto-suave); }
+.reco-invita {
+  display: flex; flex-direction: column; gap: 0.4rem; padding: 0.9rem; background: var(--fondo-alt);
+  border-left: 5px solid var(--cian-nodo); border-radius: var(--radio);
+}
+.reco-invita strong { color: var(--azul-profundo); }
+.reco-invita p { margin: 0; font-size: 0.85rem; color: var(--texto-suave); }
+.reco-invita a { font-weight: 700; font-size: 0.85rem; }
