@@ -10,6 +10,7 @@ $tabs = [
     'gafete'   => ['Gafete',   'gafete.php'],
 ];
 ?>
+<p class="nota-simulacion">Proyecto académico de simulación. Las marcas se mencionan como propuesta de alianza y no implican patrocinio confirmado.</p>
 </main>
 
 <nav class="tabbar" aria-label="Navegación de la app">

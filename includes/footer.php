@@ -27,6 +27,7 @@
   </div>
   <div class="footer-bottom">
     © <?= defined('ANIO_ACTUAL') ? ANIO_ACTUAL : date('Y') ?> UDG NEXUS — Universidad de Guadalajara. Proyecto académico, Gestión de Ferias y Exposiciones, CUCEA.
+    <span style="display:block; margin-top:0.5rem; opacity:0.85;">Proyecto académico de simulación. Las marcas se mencionan como propuesta de alianza y no implican patrocinio confirmado.</span>
   </div>
 </footer>
 <script src="assets/js/main.js"></script>

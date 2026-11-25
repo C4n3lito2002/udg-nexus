@@ -48,6 +48,8 @@ require_once 'includes/header.php';
         <p class="lead">Convertir prototipos universitarios en licencias, inversión y soluciones aplicables a cadenas productivas, acortando el camino entre un laboratorio y una industria que necesita innovar.</p>
         <h3 style="margin:1.75rem 0 0.6rem;">Alcance</h3>
         <p class="lead">Toda la Red Universitaria: salud, agroindustria, manufactura, energía, ciudades, industrias creativas y software.</p>
+        <h3 style="margin:1.75rem 0 0.6rem;">Prototipos</h3>
+        <p class="lead">120 prototipos universitarios con nivel de madurez tecnológica (TRL) de 4 a 7, con ficha técnica y propiedad intelectual revisada por el Comité Técnico y el IMPI.</p>
       </div>
       <div>
         <h3 style="margin-bottom:0.6rem;">Oferta transaccional</h3>

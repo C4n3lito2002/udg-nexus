@@ -164,6 +164,7 @@ require __DIR__ . '/../includes/app_header.php';
           $x = (int) $z['mapa_x']; $y = (int) $z['mapa_y']; $w = (int) $z['mapa_ancho']; $hh = (int) $z['mapa_alto'];
           $vivo = isset($vivas[$id]);
           $grande = $w >= 400;
+          $banda = $hh < 80;   // franja baja: pin a la izquierda y título en una línea
       ?>
       <a class="zona <?= h($z['tipo']) ?>" href="mapa.php?zona=<?= $id ?>" data-tipo="zona" data-id="<?= $id ?>"
          aria-label="Zona <?= h($z['nombre']) ?><?= $vivo ? ', con actividad en curso' : '' ?>">
@@ -177,7 +178,10 @@ require __DIR__ . '/../includes/app_header.php';
           <rect class="sala" x="<?= $x + 348 ?>" y="<?= $y + 72 ?>" width="300" height="72" rx="10"/>
           <text class="deco-txt" x="<?= $x + 498 ?>" y="<?= $y + 108 ?>">Firma de contratos</text>
         <?php endif; ?>
-        <?php if ($grande): ?>
+        <?php if ($banda): ?>
+          <?= mapa_pin($x + 26, $y + $hh - 10, $vivo ? 'vivo' : '', 0.7) ?>
+          <text class="zona-tit banda" x="<?= $x + 52 ?>" y="<?= $y + intdiv($hh, 2) ?>" dominant-baseline="central"><?= h($z['nombre']) ?></text>
+        <?php elseif ($grande): ?>
           <text class="zona-tit" x="<?= $x + 18 ?>" y="<?= $y + 36 ?>"><?= h($z['nombre']) ?></text>
           <?= mapa_pin($x + $w - 28, $y + 50, $vivo ? 'vivo' : '') ?>
         <?php else: ?>
@@ -193,10 +197,6 @@ require __DIR__ . '/../includes/app_header.php';
         <?php endif; ?>
       </a>
       <?php endforeach; ?>
-
-      <?php /* ---- Acceso ---- */ ?>
-      <rect class="acceso" x="250" y="734" width="220" height="40" rx="20"/>
-      <text class="acceso-txt" x="360" y="755">Acceso y acreditación</text>
 
       <?php /* ---- Stands (después de las zonas para quedar encima) ---- */ foreach ($proyectos as $p):
           $cx = (int) $p['mapa_x']; $cy = (int) $p['mapa_y'];

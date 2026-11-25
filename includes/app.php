@@ -440,7 +440,7 @@ function dia_del_evento(DateTimeInterface $fecha): ?int
     }
     $d0 = new DateTimeImmutable($inicio . ' 00:00:00');
     $dias = (int) $d0->diff(new DateTimeImmutable($fecha->format('Y-m-d') . ' 00:00:00'))->format('%r%a');
-    $total = (int) config_evento('evento_dias', '3');
+    $total = (int) config_evento('evento_dias', '2');
     return ($dias >= 0 && $dias < $total) ? $dias + 1 : null;
 }
 
@@ -507,8 +507,8 @@ function agenda_tabla_existe(): bool
 /** Días del evento: [['n' => 1, 'fecha' => DateTimeImmutable], ...]. */
 function agenda_fechas(): array
 {
-    $d0 = new DateTimeImmutable((string) config_evento('evento_inicio', '2027-03-10'));
-    $total = max(1, (int) config_evento('evento_dias', '3'));
+    $d0 = new DateTimeImmutable((string) config_evento('evento_inicio', '2027-03-11'));
+    $total = max(1, (int) config_evento('evento_dias', '2'));
     $dias = [];
     for ($i = 0; $i < $total; $i++) {
         $dias[] = ['n' => $i + 1, 'fecha' => $d0->modify('+' . $i . ' days')];

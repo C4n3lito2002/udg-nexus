@@ -594,6 +594,7 @@ span.btn-app[aria-disabled="true"]:hover { background: var(--blanco); color: var
 .zona.escenario.sel .zona-rect { stroke: var(--amarillo); }
 .zona-tit { font-size: 24px; font-weight: 700; fill: var(--azul-profundo); }
 .zona-tit.chica { font-size: 21px; }
+.zona-tit.banda { font-size: 18px; }
 .zona.escenario .zona-tit { fill: var(--blanco); }
 .escenario { fill: var(--azul-profundo); }
 .sala { fill: rgba(255, 255, 255, 0.12); stroke: rgba(255, 255, 255, 0.4); stroke-width: 1.5; }
@@ -763,3 +764,6 @@ span.btn-app[aria-disabled="true"]:hover { background: var(--blanco); color: var
 .reco-invita strong { color: var(--azul-profundo); }
 .reco-invita p { margin: 0; font-size: 0.85rem; color: var(--texto-suave); }
 .reco-invita a { font-weight: 700; font-size: 0.85rem; }
+
+/* Fase 5C: nota de simulación (pie de la app) */
+.nota-simulacion { margin: 1.5rem 0 0.5rem; font-size: 0.72rem; line-height: 1.4; color: var(--texto-suave); text-align: center; }

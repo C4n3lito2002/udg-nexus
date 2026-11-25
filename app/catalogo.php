@@ -51,9 +51,8 @@ require __DIR__ . '/../includes/app_header.php';
         <label for="f-trl" class="skip-link" style="position:absolute">Nivel de madurez TRL</label>
         <select id="f-trl" name="trl">
           <option value="">Cualquier TRL</option>
-          <option value="alta" <?= $trlSel === 'alta' ? 'selected' : '' ?>>TRL 7 a 9 · Alta</option>
+          <option value="alta" <?= $trlSel === 'alta' ? 'selected' : '' ?>>TRL 7 · Alta</option>
           <option value="media" <?= $trlSel === 'media' ? 'selected' : '' ?>>TRL 4 a 6 · Media</option>
-          <option value="temprana" <?= $trlSel === 'temprana' ? 'selected' : '' ?>>TRL 1 a 3 · Temprana</option>
         </select>
       </div>
     </div>

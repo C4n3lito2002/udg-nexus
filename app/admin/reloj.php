@@ -49,12 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $ahora = ahora_evento();
 $modo = reloj_modo();
 $velActual = max(1, (int) config_evento('reloj_velocidad', '1'));
-$inicioEvento = config_evento('evento_inicio', '2027-03-10');
+$inicioEvento = config_evento('evento_inicio', '2027-03-11');
 
 /** Momentos clave para saltar rápido durante la demo. */
 $atajos = [];
-$etiquetas = [[0, '09:00', 'Día 1, inauguración'], [0, '11:40', 'Día 1, a media mañana'], [0, '15:50', 'Día 1, por la tarde'],
-              [1, '10:00', 'Día 2, mañana'], [2, '10:00', 'Día 3, mañana']];
+$etiquetas = [[0, '10:00', 'Día 1, inauguración'], [0, '11:40', 'Día 1, a media mañana'], [0, '15:50', 'Día 1, por la tarde'],
+              [1, '10:00', 'Día 2, mañana'], [1, '16:30', 'Día 2, clausura']];
 foreach ($etiquetas as [$dia, $hora, $texto]) {
     $f = (new DateTimeImmutable($inicioEvento))->modify('+' . $dia . ' days');
     $atajos[] = ['texto' => $texto, 'fecha' => $f->format('Y-m-d'), 'hora' => $hora];

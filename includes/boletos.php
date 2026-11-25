@@ -60,7 +60,7 @@ function precio_texto($precio): string
     return '$' . number_format($p, fmod($p, 1.0) === 0.0 ? 0 : 2) . ' MXN';
 }
 
-/** "10 al 12 de marzo de 2027" a partir de config_evento (fecha ficticia). */
+/** "11 al 12 de marzo de 2027" a partir de config_evento (fecha ficticia). */
 function evento_rango_texto(): string
 {
     $ini = config_evento('evento_inicio');
@@ -68,7 +68,7 @@ function evento_rango_texto(): string
         return '';
     }
     $a = new DateTimeImmutable($ini);
-    $b = $a->modify('+' . (max(1, (int) config_evento('evento_dias', '3')) - 1) . ' days');
+    $b = $a->modify('+' . (max(1, (int) config_evento('evento_dias', '2')) - 1) . ' days');
     $mesA = MESES_ES[(int) $a->format('n') - 1];
     $mesB = MESES_ES[(int) $b->format('n') - 1];
     if ($a->format('Y-n') === $b->format('Y-n')) {

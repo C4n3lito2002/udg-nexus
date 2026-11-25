@@ -38,17 +38,17 @@ require_once 'includes/header.php';
       </div>
       <div class="sponsor">
         <span class="name">La Flor de Córdoba</span>
-        <span class="detail">Insumos para 4,500–5,000 bebidas de café durante la jornada, venta a precio de lista.</span>
+        <span class="detail">Barras de café con insumos para 5,000 bebidas durante las jornadas (calientes, frías y a las rocas), venta a precio de lista.</span>
         <span class="kind">aliado · privado</span>
       </div>
       <div class="sponsor">
         <span class="name">Arca Continental / Coca-Cola</span>
-        <span class="detail">Patrocinio en especie: 15,000 latas de refresco variado (1.5 bebidas gratuitas por asistente).</span>
+        <span class="detail">Patrocinio en especie: 15,000 latas de refresco variado (1.5 bebidas gratuitas por asistente), Zona Lounge &amp; Chill Out y reciclaje de las latas junto con la UdeG.</span>
         <span class="kind">patrocinio en especie</span>
       </div>
       <div class="sponsor">
         <span class="name">Casa Cuervo</span>
-        <span class="detail">Patrocinio de networking: 500 botellas, barra y 3 bartenders para el cóctel de clausura VIP.</span>
+        <span class="detail">Patrocinio de networking: 500 botellas, barra móvil y 3 bartenders para el cóctel de clausura VIP, con consumo responsable.</span>
         <span class="kind">patrocinio en especie</span>
       </div>
     </div>
@@ -65,7 +65,7 @@ require_once 'includes/header.php';
     <div class="sponsor-row">
       <div class="sponsor">
         <span class="name">PiSA Farmacéutica / Electrolit</span>
-        <span class="detail">Patrocinador oficial de hidratación clínica. Pabellón temático "HealthTech" y 5,000 sueros Electrolit donados.</span>
+        <span class="detail">Patrocinador oficial de hidratación clínica. Pabellón temático "HealthTech by PiSA", 5,000 sueros Electrolit donados y módulo de salud preventiva.</span>
         <span class="kind">naming + en especie</span>
       </div>
       <div class="sponsor">
@@ -75,12 +75,12 @@ require_once 'includes/header.php';
       </div>
       <div class="sponsor">
         <span class="name">Mercado Pago</span>
-        <span class="detail">Patrocinador Fintech: 15 terminales de pago para stands de alimentos y merchandising (entorno cashless).</span>
+        <span class="detail">Patrocinador Fintech: 30 terminales de pago para stands de alimentos y merchandising (entorno cashless).</span>
         <span class="kind">aliado tecnológico</span>
       </div>
       <div class="sponsor">
         <span class="name">Jabil Guadalajara</span>
-        <span class="detail">Equipo de comunicación para staff logístico y 2,000 souvenirs corporativos para kits VIP.</span>
+        <span class="detail">Equipo de 15 personas para cobertura audiovisual (2 cámaras, sonido y 2 videos verticales), 15 radios para la logística y 2,000 libretas corporativas para kits VIP.</span>
         <span class="kind">corporate venturing</span>
       </div>
     </div>

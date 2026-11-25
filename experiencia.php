@@ -101,24 +101,24 @@ require_once 'includes/header.php';
     </div>
     <div class="timeline">
       <div class="tl-item">
-        <span class="when mono">Mes -10 al Mes -4</span>
+        <span class="when mono">Mes -10 al Mes -7</span>
         <h4>Fase de planeación</h4>
-        <p>Cierre de sede, curaduría técnica y niveles TRL de prototipos, prospección y cierre de patrocinios, arranque de campaña de marketing ferial.</p>
+        <p>Reserva de la sede en el CCU y diseño del layout, y estructuración legal con el IMPI y la Abogacía General de la UdeG.</p>
       </div>
       <div class="tl-item">
-        <span class="when mono">Mes -3 al Mes -1</span>
+        <span class="when mono">Mes -6 al Mes -2</span>
         <h4>Fase de producción</h4>
-        <p>Venta de stands y pases ejecutivos, diseño de layout y módulos por TRL, acreditación de expositores y compradores, agendamiento de citas 1:1.</p>
+        <p>Ventas B2B y patrocinios, convocatoria en la UdeG, filtro TRL de 4 a 7 y selección de prototipos, campaña de marketing y registro de compradores.</p>
       </div>
       <div class="tl-item">
-        <span class="when mono">Días del evento</span>
+        <span class="when mono">Mes -1 y días del evento</span>
         <h4>Fase de ejecución</h4>
-        <p>Inauguración institucional, operación de las seis zonas, ruedas de negocios, firma de NDAs y cartas de intención, acto de clausura.</p>
+        <p>Pago a proveedores y logística de montaje; después, dos días de operación: inauguración, zonas especializadas, ruedas de negocios, firma de NDAs y cartas de intención, y acto de clausura.</p>
       </div>
       <div class="tl-item">
         <span class="when mono">Post-evento</span>
         <h4>Fase de cierre</h4>
-        <p>Desmontaje, balance financiero, encuestas de retroalimentación B2B e informe final de transferencia tecnológica e impacto institucional.</p>
+        <p>Desmontaje y liberación de la Plaza Bicentenario, conciliación financiera y reporte de métricas, y seguimiento con encuestas de satisfacción a compradores y expositores.</p>
       </div>
     </div>
   </div>

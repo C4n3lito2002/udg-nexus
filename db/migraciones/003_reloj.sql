@@ -16,6 +16,6 @@ USE udg_nexus;
 
 INSERT IGNORE INTO config_evento (clave, valor, descripcion) VALUES
 ('reloj_modo',      'fijo',                'Modo del reloj: real, fijo o avance'),
-('reloj_base',      '2027-03-10 11:40:00', 'Hora simulada de arranque'),
+('reloj_base',      '2027-03-11 11:40:00', 'Hora simulada de arranque'),
 ('reloj_ancla',     '',                    'Hora real en que se fijó reloj_base (modo avance)'),
 ('reloj_velocidad', '1',                   'Velocidad del avance (1 = tiempo real)');
